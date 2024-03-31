@@ -5,7 +5,7 @@ from .operation import Add, Sub, Mul, Div, TrueDiv, Mod, Pow
 from typing import TypeAlias
 
 
-Constant: TypeAlias = int | float | complex
+Constant = int, float, complex
 
 
 class VarMeta(type):
@@ -70,7 +70,7 @@ class Var(metaclass=VarMeta):
         else:
             raise Exception(f"Variable with name ({name}) doesn't exist")
 
-    def __call__(self, *kwargs) -> any:
+    def __call__(self) -> any:
         return self.value
 
     @property
@@ -166,7 +166,26 @@ class Expression:
         Expression with replace given Vars values 
         to Constants
         """
-        pass
+        for var, value in kwargs.items():
+            var = getattr(Var, var)
+            var.value = value
+
+        new_operands = []
+        for op in self._operands:
+            if isinstance(op, Constant):
+                new_operands.append(op)
+            elif isinstance(op, Var):
+                if op.value is None:
+                    new_operands.append(op)
+                else:
+                    new_operands.append(op.value)
+            elif isinstance(op, Expression):
+                new_operands.append(op(**kwargs))
+            else:
+                raise Exception(f"{type(op)} not valid type for calculate Expression")
+
+        return self._operation(*new_operands)
+
     
     def __add__(self, other): 
         return Expression(Add, self, other)
