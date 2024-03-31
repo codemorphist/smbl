@@ -7,7 +7,7 @@
 - `Domain()` — You can create some rule for variables
 - `Expression()` — You can create Expression from Constants(int, float, complex) or from variables, using operation to operate by it
 - `Operation()` — You can create operation to operate by variables
-- `Function()` — # TODO
+- ~~`Function()`~~ — # TODO
 
 # Usage examples
 
@@ -26,8 +26,9 @@ from smbl.domain import *   # For use default domain
 Imports if you want expand functionality of some classes or want to create you own based on exist class to use it for you special calculations
 
 ```python
-from smbl.domain import Domain  # To implementa you own domain class
-# from smbl.function import Function # To Implement you own Function
+from smbl.domain import Domain  # For implement you own domain class
+from smbl.operation import Operation    # For implement you own operation
+# from smbl.function import Function # For Implement you own Function
 ```
 
 ## Variable usage
