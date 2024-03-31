@@ -89,6 +89,7 @@ class PrimeDomain(Domain):
     def __in_domain__(cls, value: int) -> bool:
         return NaturalDomain(value) and cls.__is_prime__(value)
 
+
 class IntegerPrimeDomain(Domain):
     """
     Domain for positive and negative prime numbers
@@ -97,6 +98,7 @@ class IntegerPrimeDomain(Domain):
     """
     def __in_domain__(cls, value: int) -> bool:
         return IntegerDomain(value) and PrimeDomain(abs(value))
+
 
 class RealDomain(Domain):
     """

@@ -70,7 +70,7 @@ class Var(metaclass=VarMeta):
         else:
             raise Exception(f"Variable with name ({name}) doesn't exist")
 
-    def __call__(self, *kwargs) -> any:
+    def __call__(self) -> any:
         return self.value
 
     @property
@@ -166,7 +166,14 @@ class Expression:
         Expression with replace given Vars values 
         to Constants
         """
-        pass
+        for var, value in kwargs.items():
+            var_ptr = getattr(Var, var)
+            var_ptr.value = value
+
+        op_value = self._operands[0]
+        for op in self._operands[0:]:
+            op_value += op()
+        return self._operation(self, )
     
     def __add__(self, other): 
         return Expression(Add, self, other)
@@ -227,5 +234,5 @@ Var("x")
 Var("y")
 
 e = Var.x + Var.y 
-print(e(x=2, y=3))
+e(x=2, y=3)
 
