@@ -142,6 +142,12 @@ class Expression:
     def __truediv__(self, other): 
         return Expression(Div, self, other)
 
+    def __floordiv__(self, other):
+        return Expression(TrueDiv, self, other)
+
+    def __mod__(self, other):
+        return Expression(Mod, self, other)
+
     def __pow__(self, other):
         return Expression(Pow, self, other)
 
