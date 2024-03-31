@@ -1,4 +1,5 @@
 # SMBL
+
 SMBS — is simple library written of Python for symbolic calculations
 
 ## Features
@@ -10,15 +11,42 @@ SMBS — is simple library written of Python for symbolic calculations
 
 # Usage examples
 
+## Imports
+
+### Standart
+
+Standarts imports what you need to work with **SMBL**
+
+```python
+from smbl import Var    # For create new variables
+from smbl.domain import *   # For use default domain
+```
+
+### Implement own classes
+Imports if you want expand functionality of some classes or want to create you own based on exist class to use it if special calculations
+
+```python
+from smbl.domain import Domain  # To implementa you own domain class
+# from smbl.function import Function # To Implement you own Function
+```
+
 ## Variable usage
+
+This section demonstrate how to crete and use variables
+
 ```python 
 >>> Var(some_name, value=some_value, domain=some_domain)
 >>> Var.some_name		# you can acces to variable without save it to python variable
     Var(name="some_name", value="some_value", domain=some_domain)
-
+>>> Var.some_name.value = some_new_value
 ```
 
 ## Expressions usage
+
+This section demonstrate how to create Expressions from variables
+
+> **_NOTE:_** You can also use other Expressions for variables values
+
 ```python 
 >>> Var("x")
     Var("x", value=None, domain=DefaultDomain)
@@ -35,6 +63,11 @@ SMBS — is simple library written of Python for symbolic calculations
 ```
 
 ## Calculation Expression value
+
+This section demonstrate how to calculate expression, with given variables values
+
+> **_NOTE:_** You can also use other Expressions for variables values
+
 ```python
 >>> Var("x")
     Var("x", value=None, domain=DefaultDomain)
@@ -49,6 +82,8 @@ SMBS — is simple library written of Python for symbolic calculations
 ```
 
 ## Domain usage and default domains
+
+This section demonstrate how use domains
 
 ### Usage
 ```python

@@ -6,8 +6,8 @@ y = Var("y")
 z = Var("z")
 
 e = x + y ** z + (34 - x)
+e2 = y / z
 
-print(repr(e))
-
+print(e(x=e2))
 
 
