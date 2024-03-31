@@ -1,6 +1,6 @@
 # SMBL
 
-SMBS — is simple library written of Python for symbolic calculations
+**SMBS** — is simple library written of Python for symbolic calculations
 
 ## Features
 - `Var()` — You can create variables and use it in Expressions
@@ -23,7 +23,7 @@ from smbl.domain import *   # For use default domain
 ```
 
 ### Implement own classes
-Imports if you want expand functionality of some classes or want to create you own based on exist class to use it if special calculations
+Imports if you want expand functionality of some classes or want to create you own based on exist class to use it for you special calculations
 
 ```python
 from smbl.domain import Domain  # To implementa you own domain class
@@ -84,6 +84,8 @@ This section demonstrate how to calculate expression, with given variables value
 ## Domain usage and default domains
 
 This section demonstrate how use domains
+
+> **_NOTE:_** Domain it is something like rule for you variables, for examples you can create variable the values of which can only be prime numbers 
 
 ### Usage
 ```python
