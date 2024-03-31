@@ -1,6 +1,6 @@
 # SMBL
 
-**SMBS** — is simple library written of Python for symbolic calculations
+**SMBL** — is simple library written of Python for symbolic calculations
 
 ## Features
 - `Var()` — You can create variables and use it in Expressions
