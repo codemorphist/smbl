@@ -3,8 +3,8 @@ class Operation:
                  symbol: str, 
                  operation: callable, 
                  operand_count: int=2):
-        self._symbol: str = symbol
-        self._operation: callable = operation
+        self._symbol = symbol
+        self._operation = operation
         self._operand_count = operand_count
 
     def __call__(self, *operands) -> any:
@@ -35,8 +35,8 @@ class BinaryOperation(Operation):
 
 # --- DEFAULT OPERATIONS ---
 
-Plus = BinaryOperation("+", lambda a, b: a + b)
-Minus = BinaryOperation("-", lambda a, b: a - b)
+Add = BinaryOperation("+", lambda a, b: a + b)
+Sub = BinaryOperation("-", lambda a, b: a - b)
 Mul = BinaryOperation("*", lambda a, b: a * b)
 Div = BinaryOperation("/", lambda a, b: a / b)
 TrueDiv = BinaryOperation("//", lambda a, b: a // b)

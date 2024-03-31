@@ -1,11 +1,11 @@
 from domain import Domain, DefaultDomain
 from operation import Operation
+from operation import Add, Sub, Mul, Div, TrueDiv, Mod, Pow
 
 from typing import TypeAlias
 
 
 Constant: TypeAlias = int | float | complex
-
 
 
 class VarMeta(type):
@@ -20,8 +20,7 @@ class VarMeta(type):
     """
 
     def __getattr__(cls, attr):
-        var = cls.get_var(attr)
-        return var
+        return cls.get_var(attr)
 
 
 class Var(metaclass=VarMeta):
@@ -51,7 +50,7 @@ class Var(metaclass=VarMeta):
         return cls.__defined_vars__[name]
 
     @classmethod
-    def get_var(cls, name):
+    def get_var(cls, name: str):
         """
         Return variable by name
 
@@ -118,24 +117,44 @@ class Var(metaclass=VarMeta):
 class Expression:
     def __init__(self, 
                  operation: Operation, 
-                 operands: list[any]):
+                 *operands: list[any]):
+        self._operation = operation
+
+        if len(operands) > operation._operand_count:
+            raise Exception("Too many operands for operation")
+        elif len(operands) < operation._operand_count:
+            raise Exception("Not enought operands for operation")
+        else:
+            self._operands = operands
+
+    def __call__(self, **kwargs):
         ...
 
     def __add__(self, other): 
-        pass 
+        return Expression(Add, self, other)
 
     def __sub__(self, other): 
-        pass 
+        return Expression(Sub, self, other)
 
     def __mul__(self, other): 
-        pass 
+        return Expression(Mul, self, other)
 
     def __truediv__(self, other): 
-        pass
+        return Expression(Div, self, other)
+
+    def __pow__(self, other):
+        return Expression(Pow, self, other)
 
     def __repr__(self) -> str:
         pass
 
     def __str__(self) -> str:
-        pass
+        op_count = self._operation._operand_count
+        if op_count == 1: 
+            return f"({self._operation} {self._operands[0]}"
+        elif op_count == 2:
+            return f"({self._operands[0]} {self._operation} {self._operands[1]})"
+        else:
+            operands = ", ".join(self._operands)
+            return f"[{self._operation}]({operands})"
 
