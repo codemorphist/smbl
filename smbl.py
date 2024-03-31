@@ -93,17 +93,47 @@ class Var(metaclass=VarMeta):
         return self._domain.__name__
     
     def __add__(self, other): 
-        pass 
+        return Expression(Add, self, other)
 
     def __sub__(self, other): 
-        pass 
+        return Expression(Sub, self, other)
 
     def __mul__(self, other): 
-        pass 
+        return Expression(Mul, self, other)
 
     def __truediv__(self, other): 
-        pass 
-   
+        return Expression(Div, self, other)
+
+    def __floordiv__(self, other):
+        return Expression(TrueDiv, self, other)
+
+    def __mod__(self, other):
+        return Expression(Mod, self, other)
+
+    def __pow__(self, other):
+        return Expression(Pow, self, other)
+
+    def __radd__(self, other): 
+        return Expression(Add, other, self)
+
+    def __rsub__(self, other): 
+        return Expression(Sub, other, self)
+
+    def __rmul__(self, other): 
+        return Expression(Mul, other, self)
+
+    def __rtruediv__(self, other): 
+        return Expression(Div, other, self)
+
+    def __rfloordiv__(self, other):
+        return Expression(TrueDiv, other, self)
+
+    def __rmod__(self, other):
+        return Expression(Mod, other, self)
+
+    def __rpow__(self, other):
+        return Expression(Pow, other, self)
+
     def __repr__(self) -> str:
         return f'Var("{self.name}", value={self.value}, domain={self.domain_name})'
 
@@ -128,8 +158,13 @@ class Expression:
             self._operands = operands
 
     def __call__(self, **kwargs):
-        ...
-
+        """
+        Calculate value of Expression or return new 
+        Expression with replace given Vars values 
+        to Constants
+        """
+        print(kwargs)
+    
     def __add__(self, other): 
         return Expression(Add, self, other)
 
@@ -151,6 +186,27 @@ class Expression:
     def __pow__(self, other):
         return Expression(Pow, self, other)
 
+    def __radd__(self, other): 
+        return Expression(Add, other, self)
+
+    def __rsub__(self, other): 
+        return Expression(Sub, other, self)
+
+    def __rmul__(self, other): 
+        return Expression(Mul, other, self)
+
+    def __rtruediv__(self, other): 
+        return Expression(Div, other, self)
+
+    def __rfloordiv__(self, other):
+        return Expression(TrueDiv, other, self)
+
+    def __rmod__(self, other):
+        return Expression(Mod, other, self)
+
+    def __rpow__(self, other):
+        return Expression(Pow, other, self)
+
     def __repr__(self) -> str:
         pass
 
@@ -163,4 +219,11 @@ class Expression:
         else:
             operands = ", ".join(self._operands)
             return f"[{self._operation}]({operands})"
+
+Var("x")
+Var("y")
+
+e = Var.x ** Var.y
+
+print(2 * Var.x ** e + Var.y)
 
