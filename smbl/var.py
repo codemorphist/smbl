@@ -165,6 +165,10 @@ class Expression:
         Calculate value of Expression or return new 
         Expression with replace given Vars values 
         to Constants
+        
+        If some Vars value not given return Expression,
+        where Var with given values was replaced by 
+        constant
         """
         for var, value in kwargs.items():
             var = getattr(Var, var)
@@ -229,8 +233,21 @@ class Expression:
     def __rpow__(self, other):
         return Expression(Pow, other, self)
 
-    def __repr__(self) -> str:
-        pass
+    def __repr__(self, ident: int=0) -> str:
+        tab = "  "
+        tabs = tab * ident
+        operands_str = f"["
+        for op in self._operands:
+            operands_str += "\n"
+            if isinstance(op, Expression):
+                operands_str += op.__repr__(ident+1)
+            else:
+                operands_str += tabs + tab + repr(op)
+            operands_str += ","
+        operands_str += "\n" + tabs + "]" 
+
+        return f'{tabs}Expression(operation="{self._operation}", operands={operands_str})'
+     
 
     def __str__(self) -> str:
         op_count = self._operation._operand_count

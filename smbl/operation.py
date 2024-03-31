@@ -15,6 +15,9 @@ class Operation:
         else:
             return self._operation(*operands)
 
+    def __repr__(self) -> str:
+        return f'{type(self).__name__}(symbol="{self._symbol}")'
+
     def __str__(self) -> str:
         return self._symbol
 
