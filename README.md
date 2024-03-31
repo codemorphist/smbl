@@ -52,7 +52,7 @@ This section demonstrate how to create Expressions from variables
 >>> Var("x")
     Var("x", value=None, domain=DefaultDomain)
 >>> Var("y")
-	Var("y", value=None, domain=DefaultDomain)
+    Var("y", value=None, domain=DefaultDomain)
 >>> e = Var.x + Var.y
 >>> e
     Expression(operation="+", operands=[
@@ -77,7 +77,7 @@ This section demonstrate how to calculate expression, with given variables value
 >>> e = Var.x + Var.y
 >>> e(x=4, y=5)
     9
->>> e2 =e(y=5)
+>>> e2 = e(y=5)
 >>> str(e2)
     '(x + 5)'
 ```
