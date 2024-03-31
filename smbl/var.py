@@ -1,6 +1,6 @@
-from domain import Domain, DefaultDomain
-from operation import Operation
-from operation import Add, Sub, Mul, Div, TrueDiv, Mod, Pow
+from .domain import Domain, DefaultDomain
+from .operation import Operation
+from .operation import Add, Sub, Mul, Div, TrueDiv, Mod, Pow
 
 from typing import TypeAlias
 
@@ -223,9 +223,4 @@ class Expression:
             operands = ", ".join(self._operands)
             return f"[{self._operation}]({operands})"
 
-Var("x")
-Var("y")
-
-e = Var.x + Var.y 
-print(e(x=2, y=3))
 

@@ -1,9 +1,10 @@
 from smbl import Var
-from domain import *
-from operation import *
 
-Plus = BinaryOperation("+", lambda x, y: x + y)
+x = Var("x")
+y = Var("y")
+z = Var("z")
 
-print(Plus(3, 4))
-print(Plus)
+print(x + y ** z + (34 - x))
+
+
 
