@@ -1,12 +1,12 @@
 # SMBL
-SMBS -- is simple library written of Python for symbolic calculations
+SMBS — is simple library written of Python for symbolic calculations
 
 ## Features
-- `Var()` -- You can create variables and use it in Expressions
-- `Domain()` -- You can create some rule for variables
-- `Expression()` -- You can create Expression from Constants(int, float, complex) or from variables, using operation to operate by it
-- `Operation()` -- You can create operation to operate by variables
-- `Function()` -- # TODO
+- `Var()` — You can create variables and use it in Expressions
+- `Domain()` — You can create some rule for variables
+- `Expression()` — You can create Expression from Constants(int, float, complex) or from variables, using operation to operate by it
+- `Operation()` — You can create operation to operate by variables
+- `Function()` — # TODO
 
 # Usage examples
 
@@ -14,38 +14,38 @@ SMBS -- is simple library written of Python for symbolic calculations
 ```python 
 >>> Var(some_name, value=some_value, domain=some_domain)
 >>> Var.some_name		# you can acces to variable without save it to python variable
-		Var(name="some_name", value="some_value", domain=some_domain)
+	Var(name="some_name", value="some_value", domain=some_domain)
 
 ```
 
 ## Expressions usage
 ```python 
 >>> Var("x")
-		Var("x", value=None, domain=DefaultDomain)
+	Var("x", value=None, domain=DefaultDomain)
 >>> Var("y")
-		Var("y", value=None, domain=DefaultDomain)
+	Var("y", value=None, domain=DefaultDomain)
 >>> e = Var.x + Var.y
 >>> e
-		Expression(operation="+", operands=[
-  			Var("x", value=None, domain=DefaultDomain),
-  			Var("y", value=None, domain=DefaultDomain),
-		])
+	Expression(operation="+", operands=[
+  		Var("x", value=None, domain=DefaultDomain),
+  		Var("y", value=None, domain=DefaultDomain),
+	])
 >>> str(e)
-		'(x + y)'
+	'(x + y)'
 ```
 
 ## Calculation Expression value
 ```python
 >>> Var("x")
-		Var("x", value=None, domain=DefaultDomain)
+	Var("x", value=None, domain=DefaultDomain)
 >>> Var("y")
-		Var("y", value=None, domain=DefaultDomain)
+	Var("y", value=None, domain=DefaultDomain)
 >>> e = Var.x + Var.y
 >>> e(x=4, y=5)
-		9
+	9
 >>> e2 =e(y=5)
 >>> str(e2)
-		'(x + 5)'
+	'(x + 5)'
 ```
 
 ## Domain usage and default domains
