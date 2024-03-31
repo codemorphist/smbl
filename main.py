@@ -1,5 +1,9 @@
 from smbl import Var
 from domain import *
+from operation import *
 
-Var("x", value=4, domain=RealDomain)
-print(repr(Var.x))
+Plus = BinaryOperation("+", lambda x, y: x + y)
+
+print(Plus(3, 4))
+print(Plus)
+

@@ -1,4 +1,11 @@
 from domain import Domain, DefaultDomain
+from operation import Operation
+
+from typing import TypeAlias
+
+
+Constant: TypeAlias = int | float | complex
+
 
 
 class VarMeta(type):
@@ -85,10 +92,7 @@ class Var(metaclass=VarMeta):
     @property
     def domain_name(self) -> Domain:
         return self._domain.__name__
-
-    def __str__(self): 
-        return self.name
-
+    
     def __add__(self, other): 
         pass 
 
@@ -112,7 +116,26 @@ class Var(metaclass=VarMeta):
 
 
 class Expression:
-    def __init__(self):
+    def __init__(self, 
+                 operation: Operation, 
+                 operands: list[any]):
         ...
 
+    def __add__(self, other): 
+        pass 
+
+    def __sub__(self, other): 
+        pass 
+
+    def __mul__(self, other): 
+        pass 
+
+    def __truediv__(self, other): 
+        pass
+
+    def __repr__(self) -> str:
+        pass
+
+    def __str__(self) -> str:
+        pass
 
