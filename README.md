@@ -1,6 +1,6 @@
 # SMBL
 
-**SMBL** — is simple package written of Python for symbolic calculations
+**SMBL** — is simple package written on Python for symbolic calculations
 
 ## Features
 - `Var()` — You can create variables and use it in Expressions
@@ -19,7 +19,7 @@ Standarts imports what you need to work with **SMBL**
 
 ```python
 from smbl import Var    # For create new variables
-from smbl.domain import *   # For use default domain
+from smbl.domain import *   # For use default domains
 ```
 
 ### Implement own classes
@@ -42,7 +42,7 @@ This section demonstrate how to crete and use variables
 >>> Var.some_name.value = some_new_value
 ```
 
-## Expressions usage
+## Expression usage
 
 This section demonstrate how to create Expressions from variables
 
