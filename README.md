@@ -111,14 +111,6 @@ class EvenDomain(Domain):
         return value % 2 == 0
 
 
-class OddDomain(Domain):
-    """
-    Domain for odd numbers
-    """
-    def __in_domain__(cls, value: int) -> bool:
-        return not EvenDomain(value)
-
-
 class IntegerDomain(Domain):
     """
     Domain for integer numbers
@@ -166,34 +158,4 @@ class PrimeDomain(Domain):
 
     def __in_domain__(cls, value: int) -> bool:
         return NaturalDomain(value) and cls.__is_prime__(value)
-
-
-class IntegerPrimeDomain(Domain):
-    """
-    Domain for positive and negative prime numbers
-
-    ..., -17, -13, ..., -2, 2, 3, 5, 7, 11, 13, 17, ...
-    """
-    def __in_domain__(cls, value: int) -> bool:
-        return IntegerDomain(value) and PrimeDomain(abs(value))
-
-
-class RealDomain(Domain):
-    """
-    Domain for real numbers
-
-    0.(3), sqrt(2)/2, 0, 1, -pi, e, ...
-    """
-    def __in_domain__(cls, value: float | int) -> bool:
-        return isinstance(value, float) or IntegerDomain(value)
-
-
-class ComplexDomain(Domain):
-    """
-    Domain for complex numbers
-
-    1+i, i, 0, 1, 14+8i, ...
-    """
-    def __in_domain__(cls, value: float | int | complex):
-        return RealDomain(value) or isinstance(value, complex)
 ```
