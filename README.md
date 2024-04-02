@@ -1,4 +1,3 @@
-
 # SMBL
 
 **SMBL** — is simple package written on Python for symbolic calculations
@@ -10,7 +9,27 @@
 - `Operation()` — You can create operation to operate by variables
 - ~~`Function()`~~ —  **TODO**
 
-# Usage examples
+## Navigation:
+<!-- TOC start (generated with https://github.com/derlin/bitdowntoc) -->
+
+- [Imports](#imports)
+   * [Default](#default)
+   * [Implement own classes](#implement-own-classes)
+- [Variable](#variable)
+   * [Usage](#usage)
+- [Expression](#expression)
+   * [Usage](#usage-1)
+   * [Calculation](#calculation)
+- [Domain usage and default domains](#domain-usage-and-default-domains)
+   * [Usage](#usage-2)
+   * [Own Domain](#own-domain)
+   * [Examples](#examples)
+- [Operation ](#operation)
+   * [Usage](#usage-3)
+   * [Own Operation](#own-operation)
+   * [Examples](#examples-1)
+
+<!-- TOC end -->
 
 ## Imports
 
@@ -35,7 +54,9 @@ Implementations example:
 - [Domain](#own-domain)
 - [Operator](#own-operation)
 
-## Variable usage
+## Variable
+
+### Usage
 
 This section demonstrates how to create and use variables
 
@@ -46,7 +67,9 @@ This section demonstrates how to create and use variables
 >>> Var.some_name.value = some_new_value
 ```
 
-## Expression usage
+## Expression
+
+### Usage
 
 This section demonstrates how to create Expressions from variables
 
@@ -67,7 +90,7 @@ This section demonstrates how to create Expressions from variables
     '(x + y)'
 ```
 
-## Calculation Expression value
+### Calculation
 
 This section demonstrates how to calculate expression, with given variables values
 
@@ -221,7 +244,7 @@ class ComplexDomain(Domain):
         return value in RealDomain() or isinstance(value, complex)
 ```
 
-## Operations usage
+## Operation 
 
 This section demonstrates how to use operation
 
