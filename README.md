@@ -102,7 +102,7 @@ some_value in TestDomain()		# return True if some_value in TestDomain else False
 
 ### Own Domain
 
-If you want to create your own domain you should create new class create a class that inherits from `Domain` and override the `__in_domain__` method:
+If you want to create your own domain you should create a class that inherits from `Domain` and override the `__in_domain__` method:
 
 ```python
 from smbl.domain import Domain
