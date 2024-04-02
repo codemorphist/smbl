@@ -1,18 +1,18 @@
 class Domain:
-    def __in_domain__(cls, param: any) -> bool:
+    def __in_domain__(self, param: any) -> bool:
         """
         Method which check value in Domain
         """
         pass
 
     def __repr__(self) -> str:
-        return self.__name__
+        return type(self).__name__
 
     def __str__(self) -> str:
         return repr(self)
 
-    def __new__(cls, param: any=None) -> bool:
-        return cls.__in_domain__(cls, param)
+    def __contains__(self, item) -> bool:
+        return self.__in_domain__(item)
 
 
 # --- DEFAULT DOMAINS ---
@@ -21,7 +21,7 @@ class DefaultDomain(Domain):
     """
     Default domain which alway return True
     """
-    def __in_domain__(cls, param: any) -> bool:
+    def __in_domain__(self, param: any) -> bool:
         return True
 
 
@@ -29,7 +29,7 @@ class EvenDomain(Domain):
     """
     Domain for even numbers
     """
-    def __in_domain__(cls, value: int) -> bool:
+    def __in_domain__(self, value: int) -> bool:
         return value % 2 == 0
 
 
@@ -37,8 +37,8 @@ class OddDomain(Domain):
     """
     Domain for odd numbers
     """
-    def __in_domain__(cls, value: int) -> bool:
-        return not EvenDomain(value)
+    def __in_domain__(self, value: int) -> bool:
+        return not value in EvenDomain()
 
 
 class IntegerDomain(Domain):
@@ -47,7 +47,7 @@ class IntegerDomain(Domain):
 
     ..., -3, -2, -1, 0, 1, 2, 3, ...
     """
-    def __in_domain__(cls, value: int) -> bool:
+    def __in_domain__(self, value: int) -> bool:
         return isinstance(value, int)
 
 
@@ -57,8 +57,8 @@ class NaturalDomain(Domain):
 
     0, 1, 2, 3, 4, 5, 6, 7, 8, ...
     """
-    def __in_domain__(cls, value: int) -> bool:
-        return IntegerDomain(value) and value >= 0
+    def __in_domain__(self, value: int) -> bool:
+        return value in IntegerDomain() and value >= 0
 
 
 class PrimeDomain(Domain):
@@ -76,7 +76,7 @@ class PrimeDomain(Domain):
         if value == 2: 
             return True
 
-        if EvenDomain(value):
+        if value in EvenDomain():
             return False
         
         i = 3 
@@ -86,8 +86,8 @@ class PrimeDomain(Domain):
             i += 2
         return True
 
-    def __in_domain__(cls, value: int) -> bool:
-        return NaturalDomain(value) and cls.__is_prime__(value)
+    def __in_domain__(self, value: int) -> bool:
+        return value in NaturalDomain() and cls.__is_prime__(value)
 
 
 class IntegerPrimeDomain(Domain):
@@ -97,7 +97,7 @@ class IntegerPrimeDomain(Domain):
     ..., -17, -13, ..., -2, 2, 3, 5, 7, 11, 13, 17, ...
     """
     def __in_domain__(cls, value: int) -> bool:
-        return IntegerDomain(value) and PrimeDomain(abs(value))
+        return value in IntegerDomain() and abs(value) in PrimeDomain()
 
 
 class RealDomain(Domain):
@@ -107,7 +107,7 @@ class RealDomain(Domain):
     0.(3), sqrt(2)/2, 0, 1, -pi, e, ...
     """
     def __in_domain__(cls, value: float | int) -> bool:
-        return isinstance(value, float) or IntegerDomain(value)
+        return isinstance(value, float) or value in IntegerDomain()
 
 
 class ComplexDomain(Domain):
@@ -117,6 +117,6 @@ class ComplexDomain(Domain):
     1+i, i, 0, 1, 14+8i, ...
     """
     def __in_domain__(cls, value: float | int | complex):
-        return RealDomain(value) or isinstance(value, complex)
+        return value in RealDomain() or isinstance(value, complex)
 
 # --- DEFAULT DOMAINS ---

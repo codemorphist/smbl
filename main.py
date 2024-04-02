@@ -1,13 +1,11 @@
 from smbl import Var, Expression
 from smbl.domain import PrimeDomain, NaturalDomain
 
-x = Var("x")
+x = Var("x", domain=NaturalDomain)
 y = Var("y")
 z = Var("z")
 
-e = x + y ** z + (34 - x)
-e2 = y / z
+Var.x.value = 3.3
 
-print(e(x=e2))
 
 

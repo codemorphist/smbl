@@ -38,11 +38,11 @@ class Var(metaclass=VarMeta):
             self = super().__new__(cls)
             self._name = name
             
-            if value is not None and not domain(value):
+            if value is not None and not value in domain():
                 raise Exception(f"({value}) not in {domain.__name__}")
 
             self._value = value
-            self._domain = domain
+            self._domain = domain()
 
             cls.__defined_vars__[name] = self
         else:
@@ -81,20 +81,16 @@ class Var(metaclass=VarMeta):
     def value(self) -> any:
         return self._value
     @value.setter
-    def value(self, value: any):
-        if self._domain(value):
-            self._value = value
+    def value(self, val: any):
+        if val in self._domain:
+            self._value = val
         else:
-            raise Exception(f"({value}) not in {self.domain_name}")
+            raise Exception(f"({val}) not in {self.domain}")
 
     @property
     def domain(self):
         return self._domain
 
-    @property
-    def domain_name(self) -> Domain:
-        return self._domain.__name__
-    
     def __add__(self, other): 
         return Expression(Add, self, other)
 
@@ -138,7 +134,7 @@ class Var(metaclass=VarMeta):
         return Expression(Pow, other, self)
 
     def __repr__(self) -> str:
-        return f'Var("{self.name}", value={self.value}, domain={self.domain_name})'
+        return f'Var("{self.name}", value={self.value}, domain={self.domain})'
 
     def __str__(self) -> str:
         return self.name
