@@ -87,7 +87,7 @@ class PrimeDomain(Domain):
         return True
 
     def __in_domain__(self, value: int) -> bool:
-        return value in NaturalDomain() and cls.__is_prime__(value)
+        return value in NaturalDomain() and self.__is_prime__(value)
 
 
 class IntegerPrimeDomain(Domain):
@@ -96,7 +96,7 @@ class IntegerPrimeDomain(Domain):
 
     ..., -17, -13, ..., -2, 2, 3, 5, 7, 11, 13, 17, ...
     """
-    def __in_domain__(cls, value: int) -> bool:
+    def __in_domain__(self, value: int) -> bool:
         return value in IntegerDomain() and abs(value) in PrimeDomain()
 
 
@@ -106,7 +106,7 @@ class RealDomain(Domain):
 
     0.(3), sqrt(2)/2, 0, 1, -pi, e, ...
     """
-    def __in_domain__(cls, value: float | int) -> bool:
+    def __in_domain__(self, value: float | int) -> bool:
         return isinstance(value, float) or value in IntegerDomain()
 
 
@@ -116,7 +116,7 @@ class ComplexDomain(Domain):
 
     1+i, i, 0, 1, 14+8i, ...
     """
-    def __in_domain__(cls, value: float | int | complex):
+    def __in_domain__(self, value: float | int | complex):
         return value in RealDomain() or isinstance(value, complex)
 
 # --- DEFAULT DOMAINS ---

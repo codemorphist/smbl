@@ -1,3 +1,4 @@
+
 # SMBL
 
 **SMBL** — is simple package written on Python for symbolic calculations
@@ -7,15 +8,15 @@
 - `Domain()` — You can create some rule for variables
 - `Expression()` — You can create Expression from Constants(int, float, complex) or from variables, using operation to operate by it
 - `Operation()` — You can create operation to operate by variables
-- ~~`Function()`~~ — # TODO
+- ~~`Function()`~~ —  **TODO**
 
 # Usage examples
 
 ## Imports
 
-### Standart
+### Default
 
-Standarts imports what you need to work with **SMBL**
+ Imports what you need to work with **SMBL**
 
 ```python
 from smbl import Var    # For create new variables
@@ -23,17 +24,20 @@ from smbl.domain import *   # For use default domains
 ```
 
 ### Implement own classes
-Imports if you want expand functionality of some classes or want to create you own based on exist class to use it for you special calculations
+Imports if you want to expand functionality of some classes or want to create your own based on exist class to use it for your special calculations
 
 ```python
 from smbl.domain import Domain  # For implement you own domain class
 from smbl.operation import Operation    # For implement you own operation
 # from smbl.function import Function # For Implement you own Function
 ```
+Implementations example:
+- [Domain](#own-domain)
+- [Operator](#own-operation)
 
 ## Variable usage
 
-This section demonstrate how to crete and use variables
+This section demonstrates how to create and use variables
 
 ```python 
 >>> Var(some_name, value=some_value, domain=some_domain)
@@ -44,7 +48,7 @@ This section demonstrate how to crete and use variables
 
 ## Expression usage
 
-This section demonstrate how to create Expressions from variables
+This section demonstrates how to create Expressions from variables
 
 > **_NOTE:_** You can also use other Expressions for variables values
 
@@ -65,7 +69,7 @@ This section demonstrate how to create Expressions from variables
 
 ## Calculation Expression value
 
-This section demonstrate how to calculate expression, with given variables values
+This section demonstrates how to calculate expression, with given variables values
 
 > **_NOTE:_** You can also use other Expressions for variables values
 
@@ -84,22 +88,41 @@ This section demonstrate how to calculate expression, with given variables value
 
 ## Domain usage and default domains
 
-This section demonstrate how use domains
+This section demonstrates how use domains
 
 > **_NOTE:_** Domain it is something like rule for you variables, for examples you can create variable the values of which can only be prime numbers 
 
 ### Usage
+
+This section demonstrates how to check value in Domain
+
 ```python
-TestDomain(some_value)		# return True if some_value in TestDomain else False
+some_value in TestDomain()		# return True if some_value in TestDomain else False
+```
+
+### Own Domain
+
+If you want to create your own domain you should create new class create a class that inherits from `Domain` and override the `__in_domain__` method:
+
+```python
+from smbl.domain import Domain
+
+class OwnDomain(Domain):
+    def __in_domain__(self, value: any) -> bool:
+        """
+        Write code to check value in domain
+        """
+        pass
 ```
 
 ### Examples
 ```python
+
 class DefaultDomain(Domain):
     """
     Default domain which alway return True
     """
-    def __in_domain__(cls, param: any) -> bool:
+    def __in_domain__(self, param: any) -> bool:
         return True
 
 
@@ -107,8 +130,16 @@ class EvenDomain(Domain):
     """
     Domain for even numbers
     """
-    def __in_domain__(cls, value: int) -> bool:
+    def __in_domain__(self, value: int) -> bool:
         return value % 2 == 0
+
+
+class OddDomain(Domain):
+    """
+    Domain for odd numbers
+    """
+    def __in_domain__(self, value: int) -> bool:
+        return not value in EvenDomain()
 
 
 class IntegerDomain(Domain):
@@ -117,7 +148,7 @@ class IntegerDomain(Domain):
 
     ..., -3, -2, -1, 0, 1, 2, 3, ...
     """
-    def __in_domain__(cls, value: int) -> bool:
+    def __in_domain__(self, value: int) -> bool:
         return isinstance(value, int)
 
 
@@ -127,8 +158,8 @@ class NaturalDomain(Domain):
 
     0, 1, 2, 3, 4, 5, 6, 7, 8, ...
     """
-    def __in_domain__(cls, value: int) -> bool:
-        return IntegerDomain(value) and value >= 0
+    def __in_domain__(self, value: int) -> bool:
+        return value in IntegerDomain() and value >= 0
 
 
 class PrimeDomain(Domain):
@@ -146,7 +177,7 @@ class PrimeDomain(Domain):
         if value == 2: 
             return True
 
-        if EvenDomain(value):
+        if value in EvenDomain():
             return False
         
         i = 3 
@@ -156,6 +187,86 @@ class PrimeDomain(Domain):
             i += 2
         return True
 
-    def __in_domain__(cls, value: int) -> bool:
-        return NaturalDomain(value) and cls.__is_prime__(value)
+    def __in_domain__(self, value: int) -> bool:
+        return value in NaturalDomain() and cls.__is_prime__(value)
+
+
+class IntegerPrimeDomain(Domain):
+    """
+    Domain for positive and negative prime numbers
+
+    ..., -17, -13, ..., -2, 2, 3, 5, 7, 11, 13, 17, ...
+    """
+    def __in_domain__(self, value: int) -> bool:
+        return value in IntegerDomain() and abs(value) in PrimeDomain()
+
+
+class RealDomain(Domain):
+    """
+    Domain for real numbers
+
+    0.(3), sqrt(2)/2, 0, 1, -pi, e, ...
+    """
+    def __in_domain__(self, value: float | int) -> bool:
+        return isinstance(value, float) or value in IntegerDomain()
+
+
+class ComplexDomain(Domain):
+    """
+    Domain for complex numbers
+
+    1+i, i, 0, 1, 14+8i, ...
+    """
+    def __in_domain__(self, value: float | int | complex):
+        return value in RealDomain() or isinstance(value, complex)
 ```
+
+## Operations usage
+
+This section demonstrates how to use operation
+
+> **_NOTE:_** Operators is function what take some arguments and calculate result of this arguments
+
+### Usage
+
+This section demonstrates how to calculate value using operation
+
+```python
+res = TestOperator(val1, val2,..., valn)
+```
+
+### Own Operation
+
+You can create `UnaryOperation` and `BinaryOperation`:
+```python
+NewBinaryOperation = BinaryOperation("symbol", callback)
+NewUnaryOperation = UnaryOperation("symbol", callback)
+```
+
+Also, you can implement operation with custom variables count:
+
+```python
+# One 
+ThreeValueOperation("symbol", callback, operand_count=3)
+
+# Two
+class ThreeValueOperation(Operation):
+    def __init__(self,
+                 symbol: str,
+                 operation: callable):
+        super().__init__(symbol, operation, operand_count=3)
+
+```
+
+### Examples
+
+```python
+Add = BinaryOperation("+", lambda a, b: a + b)
+Sub = BinaryOperation("-", lambda a, b: a - b)
+Mul = BinaryOperation("*", lambda a, b: a * b)
+Div = BinaryOperation("/", lambda a, b: a / b)
+TrueDiv = BinaryOperation("//", lambda a, b: a // b)
+Mod = BinaryOperation("%", lambda a, b: a % b)
+Pow = BinaryOperation("^", lambda a, b: a**b)
+```
+
