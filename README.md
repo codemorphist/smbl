@@ -20,7 +20,7 @@
 - [Expression](#expression)
    * [Usage](#usage-1)
    * [Calculation](#calculation)
-- [Domain usage and default domains](#domain-usage-and-default-domains)
+- [Domain](#domain)
    * [Usage](#usage-2)
    * [Own Domain](#own-domain)
    * [Examples](#examples)
@@ -109,7 +109,7 @@ This section demonstrates how to calculate expression, with given variables valu
     '(x + 5)'
 ```
 
-## Domain usage and default domains
+## Domain
 
 This section demonstrates how use domains
 
