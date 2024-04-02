@@ -211,7 +211,7 @@ class PrimeDomain(Domain):
         return True
 
     def __in_domain__(self, value: int) -> bool:
-        return value in NaturalDomain() and cls.__is_prime__(value)
+        return value in NaturalDomain() and self.__is_prime__(value)
 
 
 class IntegerPrimeDomain(Domain):
