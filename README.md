@@ -270,7 +270,7 @@ Also, you can implement operation with custom variables count:
 
 ```python
 # One 
-ThreeValueOperation("symbol", callback, operand_count=3)
+ThreeValueOperation = Operation("symbol", callback, operand_count=3)
 
 # Two
 class ThreeValueOperation(Operation):
