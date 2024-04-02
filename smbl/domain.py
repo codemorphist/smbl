@@ -67,7 +67,7 @@ class PrimeDomain(Domain):
 
     2, 3, 5, 7, 11, 13, 17, ...
     """
-    def __is_prime__(value: int) -> bool:
+    def __is_prime__(self, value: int) -> bool:
         """
         Check natural number is prime
         """
