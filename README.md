@@ -248,7 +248,7 @@ class ComplexDomain(Domain):
 
 This section demonstrates how to use operation
 
-> **_NOTE:_** Operators is function what take some arguments and calculate result of this arguments
+> **_NOTE:_** Operators is essense what take some arguments and calculate some result
 
 ### Usage
 
