@@ -130,6 +130,7 @@ If you want to create your own domain you should create a class that inherits fr
 ```python
 from smbl.domain import Domain
 
+
 class OwnDomain(Domain):
     def __in_domain__(self, value: any) -> bool:
         """
@@ -262,6 +263,9 @@ res = TestOperator(val1, val2,..., valn)
 
 You can create `UnaryOperation` and `BinaryOperation`:
 ```python
+from smbl.operation import BinaryOperation, NewUnaryOperation
+
+
 NewBinaryOperation = BinaryOperation("symbol", callback)
 NewUnaryOperation = UnaryOperation("symbol", callback)
 ```
@@ -269,6 +273,9 @@ NewUnaryOperation = UnaryOperation("symbol", callback)
 Also, you can implement operation with custom variables count:
 
 ```python
+from smbl.operation import Operation
+
+
 # One 
 ThreeValueOperation = Operation("symbol", callback, operand_count=3)
 
