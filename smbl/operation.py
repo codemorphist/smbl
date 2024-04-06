@@ -42,7 +42,7 @@ Add = BinaryOperation("+", lambda a, b: a + b)
 Sub = BinaryOperation("-", lambda a, b: a - b)
 Mul = BinaryOperation("*", lambda a, b: a * b)
 Div = BinaryOperation("/", lambda a, b: a / b)
-TrueDiv = BinaryOperation("//", lambda a, b: a // b)
+FloorDiv = BinaryOperation("//", lambda a, b: a // b)
 Mod = BinaryOperation("%", lambda a, b: a % b)
 
 Pow = BinaryOperation("^", lambda a, b: a**b)

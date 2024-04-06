@@ -1,4 +1,17 @@
+from .operation import *
+
 class Domain:
+    """
+    Domain class 
+
+    __permitted_operations__: operation wich valid for this domain
+    __illegal_operations__: operation wich invalid for this domain
+    """
+    __permitted_operations__ = dict.fromkeys([Add, Sub, Mul, Div, 
+                                              FloorDiv, Mod, Pow])
+    __illegal_operations__ = {}
+
+
     def __in_domain__(self, param: any) -> bool:
         """
         Method which check value in Domain
@@ -116,7 +129,42 @@ class ComplexDomain(Domain):
 
     1+i, i, 0, 1, 14+8i, ...
     """
-    def __in_domain__(self, value: float | int | complex):
+    def __in_domain__(self, value: float | int | complex) -> bool:
         return value in RealDomain() or isinstance(value, complex)
 
 # --- DEFAULT DOMAINS ---
+
+
+class Zn(Domain):
+    """
+    Domain for Ring integers by modulo n
+    where n is integer
+    """
+    __illegal_operations__ = dict.fromkeys([FloorDiv, Mod])
+
+    def __init__(self, n: int):
+        """
+        :param n: Module of integers
+        """
+        if n == 0: 
+            raise ZeroDivisionError("Cannot implement Ring with zero modulo")
+        if n not in IntegerDomain():
+            raise TypeError(f"Cannot implement Ring by modulo: `{type(n).__name__}`")
+        self._modulo = n
+
+    def add(self, var1, var2):
+        return (var1.value + var2.value) % self._modulo
+
+    def __in_domain__(self, value: int) -> bool:
+        return value in IntegerDomain()
+
+
+class Zp(Zn):
+    """
+    Domain for Ring integers by modulo p
+    where p is only prime number
+    """
+    def __init__(self, p: int):
+        if p not in PrimeDomain():
+            raise ValueError("Modulo must prime number")
+        super().__init__(p)

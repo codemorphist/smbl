@@ -1,11 +1,77 @@
 from .domain import Domain, DefaultDomain
 from .operation import Operation
-from .operation import Add, Sub, Mul, Div, TrueDiv, Mod, Pow
+from .operation import Add, Sub, Mul, Div, FloorDiv, Mod, Pow
 
 from typing import TypeAlias
 
 
 Constant = int, float, complex
+
+
+class DeclaredOperations:
+    def __add__(self, other): 
+        return Expression(Add, self, other)
+
+    def __sub__(self, other): 
+        return Expression(Sub, self, other)
+
+    def __mul__(self, other): 
+        return Expression(Mul, self, other)
+
+    def __truediv__(self, other): 
+        return Expression(Div, self, other)
+
+    def __floordiv__(self, other):
+        return Expression(FloorDiv, self, other)
+
+    def __mod__(self, other):
+        return Expression(Mod, self, other)
+
+    def __pow__(self, other):
+        return Expression(Pow, self, other)
+
+    def __radd__(self, other): 
+        return Expression(Add, other, self)
+
+    def __rsub__(self, other): 
+        return Expression(Sub, other, self)
+
+    def __rmul__(self, other): 
+        return Expression(Mul, other, self)
+
+    def __rtruediv__(self, other): 
+        return Expression(Div, other, self)
+
+    def __rfloordiv__(self, other):
+        return Expression(FloorDiv, other, self)
+
+    def __rmod__(self, other):
+        return Expression(Mod, other, self)
+
+    def __rpow__(self, other):
+        return Expression(Pow, other, self)
+
+
+class Constant(DeclaredOperations):
+    def __init__(self, value: any, domain: Domain=DefaultDomain):
+        if value not in domain:
+            raise
+        self._value = value
+        self._domain = domain
+
+    @property
+    def value(self):
+        return self._value
+    
+    @property
+    def domain(self):
+        return self._domain
+
+    def __repr__(self) -> str:
+        return f"Constant(value={self.value}, domain={self.domain})"
+
+    def __str__(self) -> str:
+        return str(value)
 
 
 class VarMeta(type):
@@ -23,7 +89,7 @@ class VarMeta(type):
         return cls.get_var(attr)
 
 
-class Var(metaclass=VarMeta):
+class Var(DeclaredOperations, metaclass=VarMeta):
     """
     Variable class
 
@@ -39,14 +105,14 @@ class Var(metaclass=VarMeta):
             self._name = name
             
             if value is not None and not value in domain():
-                raise Exception(f"({value}) not in {domain.__name__}")
+                raise ValueError(f"({value}) not in {domain.__name__}")
 
             self._value = value
-            self._domain = domain()
+            self._domain = domain
 
             cls.__defined_vars__[name] = self
         else:
-            raise Exception(f"Variable with name ({name}) alredy exist")
+            raise NameError(f"Variable with name ({name}) alredy exist")
         return cls.__defined_vars__[name]
 
     @classmethod
@@ -85,54 +151,12 @@ class Var(metaclass=VarMeta):
         if val in self._domain:
             self._value = val
         else:
-            raise Exception(f"({val}) not in {self.domain}")
+            raise ValueError(f"({val}) not in {self.domain}")
 
     @property
     def domain(self):
         return self._domain
-
-    def __add__(self, other): 
-        return Expression(Add, self, other)
-
-    def __sub__(self, other): 
-        return Expression(Sub, self, other)
-
-    def __mul__(self, other): 
-        return Expression(Mul, self, other)
-
-    def __truediv__(self, other): 
-        return Expression(Div, self, other)
-
-    def __floordiv__(self, other):
-        return Expression(TrueDiv, self, other)
-
-    def __mod__(self, other):
-        return Expression(Mod, self, other)
-
-    def __pow__(self, other):
-        return Expression(Pow, self, other)
-
-    def __radd__(self, other): 
-        return Expression(Add, other, self)
-
-    def __rsub__(self, other): 
-        return Expression(Sub, other, self)
-
-    def __rmul__(self, other): 
-        return Expression(Mul, other, self)
-
-    def __rtruediv__(self, other): 
-        return Expression(Div, other, self)
-
-    def __rfloordiv__(self, other):
-        return Expression(TrueDiv, other, self)
-
-    def __rmod__(self, other):
-        return Expression(Mod, other, self)
-
-    def __rpow__(self, other):
-        return Expression(Pow, other, self)
-
+    
     def __repr__(self) -> str:
         return f'Var("{self.name}", value={self.value}, domain={self.domain})'
 
@@ -143,7 +167,7 @@ class Var(metaclass=VarMeta):
         return hash(self._name)
 
 
-class Expression:
+class Expression(DeclaredOperations):
     def __init__(self, 
                  operation: Operation, 
                  *operands: list[any]):
@@ -185,50 +209,7 @@ class Expression:
                 raise Exception(f"{type(op)} not valid type for calculate Expression")
 
         return self._operation(*new_operands)
-
-    
-    def __add__(self, other): 
-        return Expression(Add, self, other)
-
-    def __sub__(self, other): 
-        return Expression(Sub, self, other)
-
-    def __mul__(self, other): 
-        return Expression(Mul, self, other)
-
-    def __truediv__(self, other): 
-        return Expression(Div, self, other)
-
-    def __floordiv__(self, other):
-        return Expression(TrueDiv, self, other)
-
-    def __mod__(self, other):
-        return Expression(Mod, self, other)
-
-    def __pow__(self, other):
-        return Expression(Pow, self, other)
-
-    def __radd__(self, other): 
-        return Expression(Add, other, self)
-
-    def __rsub__(self, other): 
-        return Expression(Sub, other, self)
-
-    def __rmul__(self, other): 
-        return Expression(Mul, other, self)
-
-    def __rtruediv__(self, other): 
-        return Expression(Div, other, self)
-
-    def __rfloordiv__(self, other):
-        return Expression(TrueDiv, other, self)
-
-    def __rmod__(self, other):
-        return Expression(Mod, other, self)
-
-    def __rpow__(self, other):
-        return Expression(Pow, other, self)
-
+   
     def __repr__(self, ident: int=0) -> str:
         tab = "  "
         tabs = tab * ident
@@ -248,7 +229,7 @@ class Expression:
     def __str__(self) -> str:
         op_count = self._operation._operand_count
         if op_count == 1: 
-            return f"({self._operation} {self._operands[0]}"
+            return f"({self._operation} {self._operands[0]})"
         elif op_count == 2:
             return f"({self._operands[0]} {self._operation} {self._operands[1]})"
         else:
