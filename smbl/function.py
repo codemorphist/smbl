@@ -9,8 +9,8 @@ class Function(DeclaredOperations):
                  callback: callable):
         """
         :param name: name of function, in lower case
+        :param variables: set of variables which using in function
         :param callback: callable object which calculate function result
-        :param params_cout: cout of parameters in function
         """
         self._name = name.lower().strip()
         self._variables = set(variables)
