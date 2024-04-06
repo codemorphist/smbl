@@ -52,28 +52,6 @@ class DeclaredOperations:
         return Expression(Pow, other, self)
 
 
-class Constant(DeclaredOperations):
-    def __init__(self, value: any, domain: Domain=DefaultDomain):
-        if value not in domain:
-            raise
-        self._value = value
-        self._domain = domain
-
-    @property
-    def value(self):
-        return self._value
-    
-    @property
-    def domain(self):
-        return self._domain
-
-    def __repr__(self) -> str:
-        return f"Constant(value={self.value}, domain={self.domain})"
-
-    def __str__(self) -> str:
-        return str(value)
-
-
 class VarMeta(type):
     """
     Metaclass for syntax sugar of Var
@@ -99,7 +77,7 @@ class Var(DeclaredOperations, metaclass=VarMeta):
 
     __defined_vars__ = {}
 
-    def __new__(cls, name, value: any=None, domain: Domain=DefaultDomain):
+    def __new__(cls, name, value: any=None, domain: Domain=DefaultDomain()):
         if name not in cls.__defined_vars__:
             self = super().__new__(cls)
             self._name = name
@@ -162,6 +140,11 @@ class Var(DeclaredOperations, metaclass=VarMeta):
 
     def __str__(self) -> str:
         return self.name
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Var):
+            raise TypeError(f"Can't compare Var and {type(other).__name__}")
+        return self.name == other.name
     
     def __hash__(self): 
         return hash(self._name)
@@ -216,7 +199,7 @@ class Expression(DeclaredOperations):
         operands_str = f"["
         for op in self._operands:
             operands_str += "\n"
-            if isinstance(op, Expression):
+            if isinstance(op, Expression) or type(op).__name__ == "Function":
                 operands_str += op.__repr__(ident+1)
             else:
                 operands_str += tabs + tab + repr(op)
