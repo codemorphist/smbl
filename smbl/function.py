@@ -1,8 +1,9 @@
+from .var import Var
 from .operation import *
-from .var import DeclaredOperations, Var
+from .operation_handler import OperationHandler
 
 
-class Function(DeclaredOperations):        
+class Function(OperationHandler):        
     def __init__(self, 
                  name: str, 
                  variables: set[Var],
