@@ -1,12 +1,20 @@
-from smbl import Var, Expression
+from smbl import Var
+from smbl import Function
 from smbl.domain import PrimeDomain, NaturalDomain
-from smbl.function import Function
 
 x = Var("x", domain=NaturalDomain())
 y = Var("y", domain=PrimeDomain())
 z = Var("z")
 
+e = x + y
+print(e(x=1))
 
-f1 = Function("f1", (x, y, z), x + y + z)
-e = Var.x + (y * f1 / (f1 - z))
-print(repr(e))
+
+f1 = Function("f1", [x, y], x + y)
+f2 = Function("f2", [z, ], z)
+
+f3 = f1 + f2
+
+print(f3(x=1, y=1, z=2))
+print(f2(z=1))
+

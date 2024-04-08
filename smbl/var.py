@@ -11,7 +11,7 @@ Constant = int | float | complex
 
 class OperationHandler:
     """
-    Default operations for Var, Expression and Function
+    Default operations for Var, Expression
     """
     def __add__(self, other): 
         return Expression(Add, self, other)
@@ -79,8 +79,8 @@ class Var(OperationHandler, metaclass = VarMeta):
             self = super().__new__(cls)
             self._name = name
             
-            if value is not None and not value in domain():
-                raise ValueError(f"({value}) not in {domain.__name__}")
+            if value is not None and not value in domain:
+                raise ValueError(f"({value}) not in {domain}")
 
             self._value = value
             self._domain = domain
@@ -109,10 +109,15 @@ class Var(OperationHandler, metaclass = VarMeta):
         if name in cls.__defined_vars__:
             return cls.__defined_vars__[name]
         else:
-            raise Exception(f"Variable with name ({name}) doesn't exist")
+            raise NameError(f"Variable with name ({name}) doesn't exist")
 
-    def __call__(self) -> any:
-        return self.value
+    def __call__(self, **values) -> any:
+        if self.name in values:
+            return values[self.name]
+        elif self.value is not None:
+            return self.value
+        else:
+            return self
 
     @property
     def name(self) -> str:
@@ -155,7 +160,7 @@ class Expression(OperationHandler):
         else:
             self._operands = operands
 
-    def __call__(self, **kwargs):
+    def __call__(self, **vars):
         """
         Calculate value of Expression or return new 
         Expression with replace given Vars values 
@@ -165,22 +170,20 @@ class Expression(OperationHandler):
         where Var with given values was replaced by 
         constant
         """
-        for var, value in kwargs.items():
-            var = getattr(Var, var)
-            var.value = value
+        # Deprecated
+        # for var, value in vars.items():
+            # var = getattr(Var, var)
+            # var.value = value
 
         new_operands = []
         for op in self._operands:
             if isinstance(op, Constant):
                 new_operands.append(op)
             elif isinstance(op, Var):
-                if op.value is None:
-                    new_operands.append(op)
-                else:
-                    new_operands.append(op.value)
+                new_operands.append(op(**vars))
             elif isinstance(op, Expression):
                 # If Expression calculate value recursively
-                new_operands.append(op(**kwargs))
+                new_operands.append(op(**vars))
             else:
                 raise TypeError(f"{type(op)} not valid type for calculate Expression")
 
@@ -215,7 +218,7 @@ class Expression(OperationHandler):
 class Function(Expression):        
     def __init__(self, 
                  name: str, 
-                 variables: set[Var],
+                 variables: list[Var],
                  callback: callable):
         """
         :param name: name of function, in lower case
@@ -250,3 +253,42 @@ class Function(Expression):
     def __str__(self) -> str:
         vars = ", ".join([str(var) for var in self._variables])
         return f"{self._name}({vars})"
+        # return f"{self._name}({vars}) = {self._callback}"
+
+    def __add__(self, other): 
+        return Function(f"({self.name} + {other.name})", 
+                        self._variables | other._variables, 
+                        lambda **values: self._callback(**values) + other._callback(**values))
+
+    def __sub__(self, other): 
+        return Expression(Sub, self, other)
+
+    def __mul__(self, other): 
+        return Expression(Mul, self, other)
+
+    def __truediv__(self, other): 
+        return Expression(Div, self, other)
+
+    def __floordiv__(self, other):
+        return Expression(FloorDiv, self, other)
+
+    def __mod__(self, other):
+        return Expression(Mod, self, other)
+
+    def __pow__(self, other):
+        return Expression(Pow, self, other)
+
+    def __radd__(self, other): 
+        return Expression(Add, other, self)
+
+    def __rsub__(self, other): 
+        return Expression(Sub, other, self)
+
+    def __rmul__(self, other): 
+        return Expression(Mul, other, self)
+
+    def __rtruediv__(self, other): 
+        return Expression(Div, other, self)
+
+    def __rfloordiv__(self, other):
+        return Expression(FloorDiv, other, self)
