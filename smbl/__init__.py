@@ -1,9 +1,5 @@
-from smbl.var import *
-from smbl.expression import *
-from smbl.operation_handler import *
+from smbl.var import Var, Function
 
 import smbl.operation as operation
-import smbl.function as function
 import smbl.domain as domain
-import smbl.utils as utils
 
