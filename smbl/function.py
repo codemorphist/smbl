@@ -18,6 +18,9 @@ class Function(Expression):
         self._func = func
         self._deriv = deriv
     
+    def __call__(self, **kwargs):
+        return self._func(**kwargs)
+
     @property
     def symbol(self):
         return self._symbol
