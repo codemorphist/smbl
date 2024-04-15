@@ -6,47 +6,74 @@ from .operation import (Add, Sub, Mul, Div,
 from typing import Union
 
 
-Constant = int | float | complex
-
-
 class OperationHandler:
     """
     Default operations for Var, Expression
     """
+    def __is_const__(self, other) -> bool:
+        """
+        Check other is constant type
+        """
+        return isinstance(other, int | float | complex)
+
     def __add__(self, other): 
+        if self.__is_const__(other):
+            other = Constant(other)
         return Expression(Add, self.vars | other.vars, self, other)
 
     def __sub__(self, other): 
+        if self.__is_const__(other):
+            other = Constant(other)
         return Expression(Sub, self.vars | other.vars, self, other)
 
     def __mul__(self, other): 
+        if self.__is_const__(other):
+            other = Constant(other)
         return Expression(Mul, self.vars | other.vars, self, other)
 
     def __truediv__(self, other): 
+        if self.__is_const__(other):
+            other = Constant(other)
         return Expression(Div, self.vars | other.vars, self, other)
 
     def __floordiv__(self, other):
+        if self.__is_const__(other):
+            other = Constant(other)
         return Expression(FloorDiv, self.vars | other.vars, self, other)
 
     def __mod__(self, other):
+        if self.__is_const__(other):
+            other = Constant(other)
         return Expression(Mod, self.vars | other.vars, self, other)
 
     def __pow__(self, other):
+        if self.__is_const__(other):
+            other = Constant(other)
         return Expression(Pow, self.vars | other.vars, self, other)
 
     def __radd__(self, other): 
+        if self.__is_const__(other):
+            other = Constant(other)
         return Expression(Add, self.vars | other.vars, other, self)
 
     def __rsub__(self, other): 
+        if self.__is_const__(other):
+            other = Constant(other)
         return Expression(Sub, self.vars | other.vars, other, self)
 
     def __rmul__(self, other): 
+        if self.__is_const__(other):
+            other = Constant(other)
         return Expression(Mul, self.vars | other.vars, other, self)
 
     def __rtruediv__(self, other): 
+        if self.__is_const__(other):
+            other = Constant(other)
         return Expression(Div, self.vars | other.vars, other, self)
 
     def __rfloordiv__(self, other):
+        if self.__is_const__(other):
+            other = Constant(other)
         return Expression(FloorDiv, self.vars | other.vars, other, self)
 
     @property
@@ -181,6 +208,11 @@ class Expression(OperationHandler):
             raise Exception("Not enought operands for operation")
         else:
             self._operands = operands
+
+        # convert int, float or complex to Constant class
+        for i, op in enumerate(self._operands):
+            if isinstance(op, int | float | complex):
+                self._operands[i] = Constant(op)
 
     def __call__(self, **vars):
         """

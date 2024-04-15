@@ -5,7 +5,7 @@ x = Var("x")
 y = Var("y")
 z = Var("z")
 
-e = x + y + z + x
+e = x + 2
 print(e)
 print(repr(e))
 print(e.vars)

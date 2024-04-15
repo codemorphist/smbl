@@ -1,4 +1,4 @@
-from .var import Var, Expression
+from .var import Var, Constant, Expression
 from typing import Callable
 
 
@@ -12,12 +12,14 @@ class Function(Expression):
         :param func: callback for function 
         :param deriv: callback for function derivative
         """
-        self._vars = vars
+        self._vars = vars 
         self._func = func
         self._deriv = deriv
     
     def derivative(self):
-        pass
+        func = self._func
+        if isinstance(func, Constant):
+            return Function(vars=set(), func=func)
 
     @property
     def d(self):
