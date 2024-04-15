@@ -3,7 +3,7 @@ from .operation import Operation
 from .operation import (Add, Sub, Mul, Div, 
                         FloorDiv, Mod, Pow)
 
-from typing import TypeAlias
+from typing import Union
 
 
 Constant = int | float | complex
@@ -14,40 +14,59 @@ class OperationHandler:
     Default operations for Var, Expression
     """
     def __add__(self, other): 
-        return Expression(Add, self, other)
+        return Expression(Add, self.vars | other.vars, self, other)
 
     def __sub__(self, other): 
-        return Expression(Sub, self, other)
+        return Expression(Sub, self.vars | other.vars, self, other)
 
     def __mul__(self, other): 
-        return Expression(Mul, self, other)
+        return Expression(Mul, self.vars | other.vars, self, other)
 
     def __truediv__(self, other): 
-        return Expression(Div, self, other)
+        return Expression(Div, self.vars | other.vars, self, other)
 
     def __floordiv__(self, other):
-        return Expression(FloorDiv, self, other)
+        return Expression(FloorDiv, self.vars | other.vars, self, other)
 
     def __mod__(self, other):
-        return Expression(Mod, self, other)
+        return Expression(Mod, self.vars | other.vars, self, other)
 
     def __pow__(self, other):
-        return Expression(Pow, self, other)
+        return Expression(Pow, self.vars | other.vars, self, other)
 
     def __radd__(self, other): 
-        return Expression(Add, other, self)
+        return Expression(Add, self.vars | other.vars, other, self)
 
     def __rsub__(self, other): 
-        return Expression(Sub, other, self)
+        return Expression(Sub, self.vars | other.vars, other, self)
 
     def __rmul__(self, other): 
-        return Expression(Mul, other, self)
+        return Expression(Mul, self.vars | other.vars, other, self)
 
     def __rtruediv__(self, other): 
-        return Expression(Div, other, self)
+        return Expression(Div, self.vars | other.vars, other, self)
 
     def __rfloordiv__(self, other):
-        return Expression(FloorDiv, other, self)
+        return Expression(FloorDiv, self.vars | other.vars, other, self)
+
+    @property
+    def vars(self):
+        return self._vars
+
+
+class Constant(OperationHandler):
+    def __init__(self, value: Union[int, float, complex]):
+        self._value = value
+        self._vars = set()
+
+    def __call__(self, *args, **kwargs):
+        return self._value
+
+    def __str__(self) -> str:
+        return str(self._value)
+
+    def __repr__(self) -> str:
+        return f"Constant(type={type(self._value).__name__}, value={self._value})"
 
 
 class VarMeta(type):
@@ -84,6 +103,7 @@ class Var(OperationHandler, metaclass = VarMeta):
 
             self._value = value
             self._domain = domain
+            self._vars = set([self])
 
             cls.__defined_vars__[name] = self
         else:
@@ -150,7 +170,9 @@ class Var(OperationHandler, metaclass = VarMeta):
 class Expression(OperationHandler):
     def __init__(self, 
                  operation: Operation, 
+                 vars: list[Var],
                  *operands: list[any]):
+        self._vars = vars
         self._operation = operation
 
         if len(operands) > operation._operand_count:
