@@ -195,7 +195,7 @@ class Expression(OperationHandler):
         operands_str = f"["
         for op in self._operands:
             operands_str += "\n"
-            if isinstance(op, Expression) or isinstance(op, Function):
+            if isinstance(op, Expression):
                 operands_str += op.__repr__(ident+1)
             else:
                 operands_str += tabs + tab + repr(op)
@@ -214,81 +214,3 @@ class Expression(OperationHandler):
             operands = ", ".join(self._operands)
             return f"[{self._operation}]({operands})"
 
-
-class Function(Expression):        
-    def __init__(self, 
-                 name: str, 
-                 variables: list[Var],
-                 callback: callable):
-        """
-        :param name: name of function, in lower case
-        :param variables: set of variables which using in function
-        :param callback: callable object which calculate function result
-        """
-        self._name = name.lower().strip()
-        self._variables = set(variables)
-        self._callback = callback
-        self._params_count = len(self._variables)
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    def __call__(self, **values) -> any:
-        if len(self._variables) > self._params_count:
-            raise Exception(f"Too many argument for function ({self.name}), must be {self._params_count}")
-        for var, value in values.items():
-            var = getattr(Var, var)
-            if var not in self._variables:
-                raise NameError(f"Invalid variable name: `{var}` in function ({self.name})")
-
-        return self._callback(**values)
-
-    def __repr__(self, ident=0) -> str:
-        tab = "  "
-        tabs = tab * ident
-        vars_str = "[" + f"\n{tabs}{tab}".join([""] + [repr(var) for var in self._variables]) + f"\n{tabs}]"
-        return f"{tabs}Function(name={self.name}, variables={vars_str})"
-
-    def __str__(self) -> str:
-        vars = ", ".join([str(var) for var in self._variables])
-        return f"{self._name}({vars})"
-        # return f"{self._name}({vars}) = {self._callback}"
-
-    def __add__(self, other): 
-        return Function(f"({self.name} + {other.name})", 
-                        self._variables | other._variables, 
-                        lambda **values: self._callback(**values) + other._callback(**values))
-
-    def __sub__(self, other): 
-        return Expression(Sub, self, other)
-
-    def __mul__(self, other): 
-        return Expression(Mul, self, other)
-
-    def __truediv__(self, other): 
-        return Expression(Div, self, other)
-
-    def __floordiv__(self, other):
-        return Expression(FloorDiv, self, other)
-
-    def __mod__(self, other):
-        return Expression(Mod, self, other)
-
-    def __pow__(self, other):
-        return Expression(Pow, self, other)
-
-    def __radd__(self, other): 
-        return Expression(Add, other, self)
-
-    def __rsub__(self, other): 
-        return Expression(Sub, other, self)
-
-    def __rmul__(self, other): 
-        return Expression(Mul, other, self)
-
-    def __rtruediv__(self, other): 
-        return Expression(Div, other, self)
-
-    def __rfloordiv__(self, other):
-        return Expression(FloorDiv, other, self)
