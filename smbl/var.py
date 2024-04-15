@@ -66,6 +66,11 @@ class OperationHandler:
             other = Constant(other)
         return Expression(Mul, self.vars | other.vars, other, self)
 
+    def __rpow__(self, other): 
+        if self.__is_const__(other):
+            other = Constant(other)
+        return Expression(Pow, self.vars | other.vars, other, self)
+
     def __rtruediv__(self, other): 
         if self.__is_const__(other):
             other = Constant(other)
