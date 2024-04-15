@@ -1,12 +1,8 @@
-from smbl import Var
-
+from smbl import Var, Function, function
+from math import log
 
 x = Var("x")
-y = Var("y")
-z = Var("z")
 
-e = x + 2
-print(e)
-print(repr(e))
-print(e.vars)
+f = function(x ** 2) 
+print(f)
 
