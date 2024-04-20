@@ -65,7 +65,6 @@ def D(func) -> Function:
             raise TypeError(f"Invalid operation `{op}` to take derivative")
 
         f, g = func._operands
-        print(f, g)
         if op is Add:
             return function(D(f)  + D(g))
         elif op is Sub:

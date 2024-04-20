@@ -1,5 +1,4 @@
-from smbl.var import Var
-from smbl.function import Function, function, D
+from smbl.var import Var, Expression
 
 import smbl.operation as operation
 import smbl.domain as domain

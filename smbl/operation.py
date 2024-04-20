@@ -37,14 +37,17 @@ class BinaryOperation(Operation):
 
 
 # --- DEFAULT OPERATIONS ---
-
+# TODO: Make +,-,*,/,//,%,^ operation classes
+ 
 Add = BinaryOperation("+", lambda a, b: a + b)
 Sub = BinaryOperation("-", lambda a, b: a - b)
 Mul = BinaryOperation("*", lambda a, b: a * b)
 Div = BinaryOperation("/", lambda a, b: a / b)
 FloorDiv = BinaryOperation("//", lambda a, b: a // b)
 Mod = BinaryOperation("%", lambda a, b: a % b)
-
 Pow = BinaryOperation("^", lambda a, b: a**b)
+
+OpVar = UnaryOperation("VAR", lambda a: a())
+OpConst = UnaryOperation("CONST", lambda a: a())
 
 # --- DEFAULT OPERATIONS --- 

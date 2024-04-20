@@ -1,9 +1,10 @@
 from .domain import Domain, DefaultDomain
-from .operation import Operation
+from .operation import Operation, UnaryOperation, BinaryOperation
+from .operation import OpVar, OpConst
 from .operation import (Add, Sub, Mul, Div, 
                         FloorDiv, Mod, Pow)
 
-from typing import Union
+from typing import Callable, Union
 
 
 class OperationHandler:
@@ -14,84 +15,79 @@ class OperationHandler:
         """
         Check other is constant type
         """
-        return isinstance(other, int | float | complex)
+        return isinstance(other, (int, float | complex))
 
     def __add__(self, other): 
-        if self.__is_const__(other):
-            other = Constant(other)
-        return Expression(Add, self.vars | other.vars, self, other)
+        other = Expression.to_expression(other)
+        self = Expression.to_expression(self)
+        return Expression(Add, self.vars | other.vars, [self, other])
 
     def __sub__(self, other): 
-        if self.__is_const__(other):
-            other = Constant(other)
-        return Expression(Sub, self.vars | other.vars, self, other)
+        other = Expression.to_expression(other)
+        self = Expression.to_expression(self)
+        return Expression(Sub, self.vars | other.vars, [self, other])
 
     def __mul__(self, other): 
-        if self.__is_const__(other):
-            other = Constant(other)
-        return Expression(Mul, self.vars | other.vars, self, other)
+        other = Expression.to_expression(other)
+        self = Expression.to_expression(self)
+        return Expression(Mul, self.vars | other.vars, [self, other])
 
     def __truediv__(self, other): 
-        if self.__is_const__(other):
-            other = Constant(other)
-        return Expression(Div, self.vars | other.vars, self, other)
+        other = Expression.to_expression(other)
+        self = Expression.to_expression(self)
+        return Expression(Div, self.vars | other.vars, [self, other])
 
     def __floordiv__(self, other):
-        if self.__is_const__(other):
-            other = Constant(other)
-        return Expression(FloorDiv, self.vars | other.vars, self, other)
+        other = Expression.to_expression(other)
+        self = Expression.to_expression(self)
+        return Expression(FloorDiv, self.vars | other.vars, [self, other])
 
     def __mod__(self, other):
-        if self.__is_const__(other):
-            other = Constant(other)
-        return Expression(Mod, self.vars | other.vars, self, other)
+        other = Expression.to_expression(other)
+        self = Expression.to_expression(self)
+        return Expression(Mod, self.vars | other.vars, [self, other])
 
     def __pow__(self, other):
-        if self.__is_const__(other):
-            other = Constant(other)
-        return Expression(Pow, self.vars | other.vars, self, other)
+        other = Expression.to_expression(other)
+        self = Expression.to_expression(self)
+        return Expression(Pow, self.vars | other.vars, [self, other])
 
     def __radd__(self, other): 
-        if self.__is_const__(other):
-            other = Constant(other)
-        return Expression(Add, self.vars | other.vars, other, self)
+        other = Expression.to_expression(other)
+        self = Expression.to_expression(self)
+        return Expression(Add, self.vars | other.vars, [other, self])
 
     def __rsub__(self, other): 
-        if self.__is_const__(other):
-            other = Constant(other)
-        return Expression(Sub, self.vars | other.vars, other, self)
+        other = Expression.to_expression(other)
+        self = Expression.to_expression(self)
+        return Expression(Sub, self.vars | other.vars, [other, self])
 
     def __rmul__(self, other): 
-        if self.__is_const__(other):
-            other = Constant(other)
-        return Expression(Mul, self.vars | other.vars, other, self)
+        other = Expression.to_expression(other)
+        self = Expression.to_expression(self)
+        return Expression(Mul, self.vars | other.vars, [other, self])
 
     def __rpow__(self, other): 
-        if self.__is_const__(other):
-            other = Constant(other)
-        return Expression(Pow, self.vars | other.vars, other, self)
+        other = Expression.to_expression(other)
+        self = Expression.to_expression(self)
+        return Expression(Pow, self.vars | other.vars, [other, self])
 
     def __rtruediv__(self, other): 
-        if self.__is_const__(other):
-            other = Constant(other)
-        return Expression(Div, self.vars | other.vars, other, self)
+        other = Expression.to_expression(other)
+        self = Expression.to_expression(self)
+        return Expression(Div, self.vars | other.vars, [other, self])
 
     def __rfloordiv__(self, other):
-        if self.__is_const__(other):
-            other = Constant(other)
-        return Expression(FloorDiv, self.vars | other.vars, other, self)
-
-    @property
-    def vars(self):
-        return self._vars
+        other = Expression.to_expression(other)
+        self = Expression.to_expression(self)
+        return Expression(FloorDiv, self.vars | other.vars, [other, self])
 
 
 class Constant(OperationHandler):
     def __init__(self, value: Union[int, float, complex]):
         self._value = value
-        self._vars = set()
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self):
         return self._value
 
     def __str__(self) -> str:
@@ -115,6 +111,12 @@ class VarMeta(type):
     def __getattr__(cls, attr):
         return cls.get_var(attr)
 
+    def exist(cls, var: str):
+        """
+        Check var is exist by name
+        """
+        return var is cls.__defined_vars__
+
 
 class Var(OperationHandler, metaclass = VarMeta):
     """
@@ -135,17 +137,14 @@ class Var(OperationHandler, metaclass = VarMeta):
 
             self._value = value
             self._domain = domain
-            self._vars = set([self])
 
             cls.__defined_vars__[name] = self
-        else:
-            raise NameError(f"Variable with name ({name}) alredy exist")
         return cls.__defined_vars__[name]
 
     @classmethod
     def get_var(cls, name: str):
         """
-        Return variable by name
+        Return variable by name like attribute
 
         Usage example:
         >>> Var("x")
@@ -163,13 +162,8 @@ class Var(OperationHandler, metaclass = VarMeta):
         else:
             raise NameError(f"Variable with name ({name}) doesn't exist")
 
-    def __call__(self, **values) -> any:
-        if self.name in values:
-            return values[self.name]
-        elif self.value is not None:
-            return self.value
-        else:
-            return self
+    def __call__(self) -> any:
+        return self.value
 
     @property
     def name(self) -> str:
@@ -198,26 +192,63 @@ class Var(OperationHandler, metaclass = VarMeta):
     def __hash__(self): 
         return hash(self._name)
 
+    def __set__(self, other):
+        self.value = other
+
 
 class Expression(OperationHandler):
     def __init__(self, 
                  operation: Operation, 
-                 vars: list[Var],
-                 *operands: list[any]):
+                 vars: set[Var],
+                 operands: list[any]):
         self._vars = vars
         self._operation = operation
+        self._operands = operands
 
-        if len(operands) > operation._operand_count:
-            raise Exception("Too many operands for operation")
-        elif len(operands) < operation._operand_count:
-            raise Exception("Not enought operands for operation")
+    @property
+    def vars(self) -> set[Var]:
+        """
+        Return set of vars using in Expression
+        """
+        return self._vars
+
+    @staticmethod
+    def to_expression(other):
+        if isinstance(other, Var):
+            return Expression.from_var(other) 
+        elif isinstance(other, (Constant, int, float, complex)):
+            return Expression.from_const(other)
+        elif isinstance(other, Expression):
+            return other
+        elif isinstance(other, Callable):
+            return Expression.from_func(other)
         else:
-            self._operands = operands
+            raise TypeError(f"Invalid type `{type(other).__name__}` to convert to Expression")
 
-        # convert int, float or complex to Constant class
-        for i, op in enumerate(self._operands):
-            if isinstance(op, int | float | complex):
-                self._operands[i] = Constant(op)
+    @staticmethod
+    def from_var(other: Var):
+        return Expression(OpVar, {other}, [other])
+
+    @staticmethod
+    def from_const(other: Constant | int | float | complex):
+        if isinstance(other, (int, float, complex)):
+            other = Constant(other)
+        return Expression(OpConst, set(), [other])
+
+    @staticmethod
+    def from_func(other: callable):
+        # TODO
+        # Extract variables names from fucntion (black box)
+        vars = []
+        for param in other.__code__.co_varnames:
+            v = None
+            if not Var.exist(param):
+                v = Var(param)
+            else:
+                v = Var.getattr(param)
+            vars.append(v)
+        other._operand_count= other.__code__.co_argcount
+        return Expression(other, {*vars}, [*vars])
 
     def __call__(self, **vars):
         """
@@ -229,25 +260,29 @@ class Expression(OperationHandler):
         where Var with given values was replaced by 
         constant
         """
-        # Deprecated
-        # for var, value in vars.items():
-            # var = getattr(Var, var)
-            # var.value = value
+        for var in self._vars:
+            if var.name not in vars:
+                raise NameError(f"Variable `{var.name}` not given value")
+            var.value = vars[var.name]
 
-        new_operands = []
+        if self._operation is OpVar or self._operation is OpConst:
+            return self._operands[0]()
+
+        operands = []
         for op in self._operands:
-            if isinstance(op, Constant):
-                new_operands.append(op)
-            elif isinstance(op, Var):
-                new_operands.append(op(**vars))
-            elif isinstance(op, Expression):
-                # If Expression calculate value recursively
-                new_operands.append(op(**vars))
+            if isinstance(op, Expression):
+                operands.append(op(**vars))
+            elif isinstance(op, Callable):
+                # TODO
+                pass
             else:
-                raise TypeError(f"{type(op)} not valid type for calculate Expression")
+                raise TypeError(f"{type(op)} not valid type of operand")
 
-        return self._operation(*new_operands)
+        return self._operation(*operands)
    
+    def composition(self, **params):
+        pass
+
     def __repr__(self, ident: int=0) -> str:
         tab = "  "
         tabs = tab * ident
@@ -256,19 +291,24 @@ class Expression(OperationHandler):
             operands_str += "\n"
             if isinstance(op, Expression):
                 operands_str += op.__repr__(ident+1)
-            else:
+            elif isinstance(op, (Var, Constant)):
                 operands_str += tabs + tab + repr(op)
-            operands_str += ","
+            elif isinstance(op, Callable):
+                operands_str += op.__name__
+        operands_str += ","
         operands_str += "\n" + tabs + "]" 
 
         return f'{tabs}Expression(operation="{self._operation}", operands={operands_str})'
 
     def __str__(self) -> str:
-        op_count = self._operation._operand_count
-        if op_count == 1: 
+        if self._operation is OpVar or self._operation is OpConst:
+            return f"{self._operands[0]}"
+        elif isinstance(self._operation, UnaryOperation): 
             return f"({self._operation} {self._operands[0]})"
-        elif op_count == 2:
+        elif isinstance(self._operation, BinaryOperation):
             return f"({self._operands[0]} {self._operation} {self._operands[1]})"
+        elif isinstance(self._operation, Callable):
+            return f"{self._operation.__name__}({', '.join([str(op) for op in self._operands])})"
         else:
             operands = ", ".join(self._operands)
             return f"[{self._operation}]({operands})"
