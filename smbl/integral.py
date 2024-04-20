@@ -4,9 +4,9 @@ Test module for integral implementation
 from typing import Callable, Any
 
 
-def integral(f: Callable[[Any], float], 
+def integral(f: Callable[[float], float], 
              segment: tuple[float, float],
-             ep: float = 1e-4) -> float:
+             ep: float = 1e-5) -> float:
     """
     Return integral of function on segment
     by Riman
