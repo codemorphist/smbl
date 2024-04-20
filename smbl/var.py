@@ -15,7 +15,7 @@ class OperationHandler:
         """
         Check other is constant type
         """
-        return isinstance(other, (int, float | complex))
+        return isinstance(other, (int, float, complex))
 
     def __add__(self, other): 
         other = Expression.to_expression(other)
@@ -108,26 +108,33 @@ class VarMeta(type):
         Var("x", value=None, domain=DefaultDomain)
     """
 
-    def __getattr__(cls, attr):
-        return cls.get_var(attr)
+    def __getattr__(cls, var_name):
+        if not cls.is_exist(var_name):
+            raise NameError(f"Variable with name `{var_name}` not exist")
+        return cls.__defined_vars__[var_name]
 
-    def exist(cls, var: str):
+    def is_exist(cls, var: str):
         """
         Check var is exist by name
         """
-        return var is cls.__defined_vars__
+        return var in cls.__defined_vars__
 
 
 class Var(OperationHandler, metaclass = VarMeta):
     """
     Variable class
 
-    __new__: Create new varible and save it in storage of all variables
     __defined_vars__: dict[str, Var] Dict with every variable by name
     """
+
     __defined_vars__ = {}
 
     def __new__(cls, name, value: any=None, domain: Domain=DefaultDomain()):
+        """
+        Singleton pattern 
+
+        Create new varible and save it in storage of all variables
+        """
         if name not in cls.__defined_vars__:
             self = super().__new__(cls)
             self._name = name
@@ -140,27 +147,6 @@ class Var(OperationHandler, metaclass = VarMeta):
 
             cls.__defined_vars__[name] = self
         return cls.__defined_vars__[name]
-
-    @classmethod
-    def get_var(cls, name: str):
-        """
-        Return variable by name like attribute
-
-        Usage example:
-        >>> Var("x")
-            Var("x", value=None, domain=DefaultDomain)
-        >>> Var.get_var("x")        # by method get_var()
-            Var("x", value=None, domain=DefaultDomain)
-        >>> Var.x                   # syntax sugar by __getattr__ method
-            Var("x", value=None, domain=DefaultDomain)
-        >>> Var.x.value = 1
-        >>> Var.x
-            Var("x", value=1, domain=DefaultDomain)        
-        """
-        if name in cls.__defined_vars__:
-            return cls.__defined_vars__[name]
-        else:
-            raise NameError(f"Variable with name ({name}) doesn't exist")
 
     def __call__(self) -> any:
         return self.value
@@ -201,6 +187,12 @@ class Expression(OperationHandler):
                  operation: Operation, 
                  vars: set[Var],
                  operands: list[any]):
+        """
+        :param operation: Operation for Expression, CONST, VAR return value of Var
+                          or Constant
+        :params vars: varibles used in Expression
+        :params operands: operands in Expression
+        """
         self._vars = vars
         self._operation = operation
         self._operands = operands
@@ -230,41 +222,29 @@ class Expression(OperationHandler):
         return Expression(OpVar, {other}, [other])
 
     @staticmethod
-    def from_const(other: Constant | int | float | complex):
+    def from_const(other: Union[Constant, int, float, complex]):
         if isinstance(other, (int, float, complex)):
             other = Constant(other)
         return Expression(OpConst, set(), [other])
 
     @staticmethod
-    def from_func(other: callable):
+    def from_func(other: Callable):
         # TODO
-        # Extract variables names from fucntion (black box)
-        vars = []
-        for param in other.__code__.co_varnames:
-            v = None
-            if not Var.exist(param):
-                v = Var(param)
-            else:
-                v = Var.getattr(param)
-            vars.append(v)
-        other._operand_count= other.__code__.co_argcount
-        return Expression(other, {*vars}, [*vars])
+        # NOTE: Use func.__code__.co_varnames to get function parameters
+        pass
 
     def __call__(self, **vars):
         """
         Calculate value of Expression or return new 
         Expression with replace given Vars values 
-        to Constants
-        
-        If some Vars value not given return Expression,
-        where Var with given values was replaced by 
-        constant
+        to constant
         """
         for var in self._vars:
             if var.name not in vars:
                 raise NameError(f"Variable `{var.name}` not given value")
             var.value = vars[var.name]
 
+        # if operation is OpVar of OpConst return only value
         if self._operation is OpVar or self._operation is OpConst:
             return self._operands[0]()
 
@@ -274,13 +254,14 @@ class Expression(OperationHandler):
                 operands.append(op(**vars))
             elif isinstance(op, Callable):
                 # TODO
+                # NOTE: Use func.__code__.co_varnames to get function parameters
                 pass
             else:
                 raise TypeError(f"{type(op)} not valid type of operand")
 
         return self._operation(*operands)
    
-    def composition(self, **params):
+    def substitude(self, **params):
         pass
 
     def __repr__(self, ident: int=0) -> str:
@@ -294,7 +275,8 @@ class Expression(OperationHandler):
             elif isinstance(op, (Var, Constant)):
                 operands_str += tabs + tab + repr(op)
             elif isinstance(op, Callable):
-                operands_str += op.__name__
+                # TODO
+                pass
         operands_str += ","
         operands_str += "\n" + tabs + "]" 
 
@@ -308,7 +290,8 @@ class Expression(OperationHandler):
         elif isinstance(self._operation, BinaryOperation):
             return f"({self._operands[0]} {self._operation} {self._operands[1]})"
         elif isinstance(self._operation, Callable):
-            return f"{self._operation.__name__}({', '.join([str(op) for op in self._operands])})"
+            # TODO
+            pass
         else:
             operands = ", ".join(self._operands)
             return f"[{self._operation}]({operands})"
