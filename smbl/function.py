@@ -1,23 +1,28 @@
+# WARNING: This molude is deprecated, DO NOT USE !!!
+
+
 from .var import Var, Constant, Expression
 from .operation import *
 from typing import Callable
 
 
-class Function(Expression): 
-    def __init__(self,
-                 vars: set[Var], 
-                 func: Callable[[float], float],
-                 deriv: Callable[[float], float] = None):
+class Function(Expression):
+    def __init__(
+        self,
+        vars: set[Var],
+        func: Callable[[float], float],
+        deriv: Callable[[float], float] = None,
+    ):
         """
         :param symbol: symbol or name of funtion
         :param vars: set of vars in function
-        :param func: callback for function 
+        :param func: callback for function
         :param deriv: callback for function derivative
         """
-        self._vars = vars 
+        self._vars = vars
         self._func = func
         self._deriv = deriv
-    
+
     def __call__(self, **kwargs):
         return self._func(**kwargs)
 
@@ -39,21 +44,15 @@ class Function(Expression):
         vars = ", ".join([v.name for v in self._vars])
         return f"{self._func}"
 
-    def __repr__(self, ident: int=0) -> str:
+    def __repr__(self, ident: int = 0) -> str:
         pass
 
 
 def D(func) -> Function:
     if isinstance(func, Constant):
-        return Function(
-            vars=set(),
-            func=Constant(0)
-        )
+        return Function(vars=set(), func=Constant(0))
     elif isinstance(func, Var):
-        return Function(
-            vars=set(),
-            func=Constant(1)
-        )
+        return Function(vars=set(), func=Constant(1))
     elif isinstance(func, Function):
         if func._deriv is not None:
             return func._deriv
@@ -66,15 +65,15 @@ def D(func) -> Function:
 
         f, g = func._operands
         if op is Add:
-            return function(D(f)  + D(g))
+            return function(D(f) + D(g))
         elif op is Sub:
             return function(D(f) - D(g))
         elif op is Mul:
-            return function(D(f)*g + f*D(g))
+            return function(D(f) * g + f * D(g))
         elif op is Div:
-            return function((D(f)*g - f*D(g))/(g**2))
+            return function((D(f) * g - f * D(g)) / (g**2))
         else:
-            return function(f ** g * (D(g) * Ln(f) + g*D(Ln(f)))) 
+            return function(f**g * (D(g) * Ln(f) + g * D(Ln(f))))
     else:
         raise TypeError(f"Invalid type to take derivative `{type(func)}`")
 
@@ -84,10 +83,7 @@ def function(other) -> Function:
     Convert Var, Constant, or Expression to Function
     """
     if type(other) in [Var, Constant, Expression]:
-        return Function(
-            vars=other.vars,
-            func=other
-        )
+        return Function(vars=other.vars, func=other)
     elif isinstance(other, Function):
         return other
     else:
@@ -96,10 +92,11 @@ def function(other) -> Function:
 
 # --- BASIC MATH FUNCTIONS ---
 
+
 class Ln(Function):
     def __init__(self, param: Var | Expression | Function):
         self._param = param
-        self._vars = param.vars 
+        self._vars = param.vars
         self._func = self.__ln__
         self._deriv = 1 / param * D(param)
 
@@ -108,4 +105,3 @@ class Ln(Function):
 
     def __str__(self) -> str:
         return f"ln({self._param})"
-

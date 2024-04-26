@@ -4,7 +4,7 @@ from .operation import OpVar, OpConst
 from .operation import Add, Sub, Mul, Div, FloorDiv, Mod, Pow
 
 from typing import Callable, Union
-import math
+import math  # for log(x) function
 
 
 class OperationHandler:
@@ -230,7 +230,6 @@ class Expression(OperationHandler):
 
     @staticmethod
     def from_func(func: Callable):
-        # TODO
         # NOTE: Use func.__code__.co_varnames to get function parameters
         vars = []
         for v in func.__code__.co_varnames:
@@ -293,6 +292,8 @@ class Expression(OperationHandler):
         return Expression(self._operation, vars, operands)
 
     def derivative(self, var: Var):
+        # TODO: Implement derivative for funciton
+
         if self._operation not in [Add, Sub, Mul, Div, Pow, OpVar, OpConst]:
             raise Exception(f"Invalid operation {self._operation} to take derivative")
         if var not in self._vars:
@@ -339,9 +340,6 @@ class Expression(OperationHandler):
                 operands_str += op.__repr__(ident + 1)
             elif isinstance(op, (Var, Constant)):
                 operands_str += tabs + tab + repr(op)
-            elif isinstance(op, Callable):
-                # TODO
-                pass
         operands_str += ","
         operands_str += "\n" + tabs + "]"
 
