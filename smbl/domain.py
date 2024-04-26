@@ -1,16 +1,10 @@
 from .operation import *
 
+
 class Domain:
     """
-    Domain class 
-
-    __permitted_operations__: operation wich valid for this domain
-    __illegal_operations__: operation wich invalid for this domain
+    Domain class
     """
-    __permitted_operations__ = dict.fromkeys([Add, Sub, Mul, Div, 
-                                              FloorDiv, Mod, Pow])
-    __illegal_operations__ = {}
-
 
     def __in_domain__(self, param: any) -> bool:
         """
@@ -30,10 +24,12 @@ class Domain:
 
 # --- DEFAULT DOMAINS ---
 
+
 class DefaultDomain(Domain):
     """
     Default domain which alway return True
     """
+
     def __in_domain__(self, param: any) -> bool:
         return True
 
@@ -42,6 +38,7 @@ class EvenDomain(Domain):
     """
     Domain for even numbers
     """
+
     def __in_domain__(self, value: int) -> bool:
         return value % 2 == 0
 
@@ -50,8 +47,9 @@ class OddDomain(Domain):
     """
     Domain for odd numbers
     """
+
     def __in_domain__(self, value: int) -> bool:
-        return not value in EvenDomain()
+        return value not in EvenDomain()
 
 
 class IntegerDomain(Domain):
@@ -60,6 +58,7 @@ class IntegerDomain(Domain):
 
     ..., -3, -2, -1, 0, 1, 2, 3, ...
     """
+
     def __in_domain__(self, value: int) -> bool:
         return isinstance(value, int)
 
@@ -70,6 +69,7 @@ class NaturalDomain(Domain):
 
     0, 1, 2, 3, 4, 5, 6, 7, 8, ...
     """
+
     def __in_domain__(self, value: int) -> bool:
         return value in IntegerDomain() and value >= 0
 
@@ -80,20 +80,21 @@ class PrimeDomain(Domain):
 
     2, 3, 5, 7, 11, 13, 17, ...
     """
+
     def __is_prime__(self, value: int) -> bool:
         """
         Check natural number is prime
         """
         if value < 2:
             return False
-        if value == 2: 
+        if value == 2:
             return True
 
         if value in EvenDomain():
             return False
-        
-        i = 3 
-        while i*i <= value:
+
+        i = 3
+        while i * i <= value:
             if value % i:
                 return False
             i += 2
@@ -109,6 +110,7 @@ class IntegerPrimeDomain(Domain):
 
     ..., -17, -13, ..., -2, 2, 3, 5, 7, 11, 13, 17, ...
     """
+
     def __in_domain__(self, value: int) -> bool:
         return value in IntegerDomain() and abs(value) in PrimeDomain()
 
@@ -119,6 +121,7 @@ class RealDomain(Domain):
 
     0.(3), sqrt(2)/2, 0, 1, -pi, e, ...
     """
+
     def __in_domain__(self, value: float | int) -> bool:
         return isinstance(value, float) or value in IntegerDomain()
 
@@ -129,8 +132,10 @@ class ComplexDomain(Domain):
 
     1+i, i, 0, 1, 14+8i, ...
     """
+
     def __in_domain__(self, value: float | int | complex) -> bool:
         return value in RealDomain() or isinstance(value, complex)
+
 
 # --- DEFAULT DOMAINS ---
 
@@ -140,13 +145,12 @@ class Zn(Domain):
     Domain for Ring integers by modulo n
     where n is integer
     """
-    __illegal_operations__ = dict.fromkeys([FloorDiv, Mod])
 
     def __init__(self, n: int):
         """
         :param n: Module of integers
         """
-        if n == 0: 
+        if n == 0:
             raise ZeroDivisionError("Cannot implement Ring with zero modulo")
         if n not in IntegerDomain():
             raise TypeError(f"Cannot implement Ring by modulo: `{type(n).__name__}`")
@@ -164,6 +168,7 @@ class Zp(Zn):
     Domain for Ring integers by modulo p
     where p is only prime number
     """
+
     def __init__(self, p: int):
         if p not in PrimeDomain():
             raise ValueError("Modulo must prime number")
