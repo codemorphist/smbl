@@ -362,3 +362,13 @@ class Expression(OperationHandler):
         else:
             operands = ", ".join(self._operands)
             return f"[{self._operation}]({operands})"
+
+    def __getattr__(self, attr: str):
+        if attr.startswith("d"):
+            name = attr.split("d")[1]
+            if not name:
+                name = "x"
+            var = Var(name) if not Var.exist(name) else getattr(Var, name)
+            return self.derivative(var)
+        else:
+            raise AttributeError(attr)
