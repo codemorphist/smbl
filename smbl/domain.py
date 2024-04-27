@@ -1,22 +1,24 @@
-from .operation import *
+from abc import ABC, abstractmethod
+from typing import Any
 
 
-class Domain:
+class Domain(ABC):
+    # TODO: Implement operation override in some domains
     """
     Domain class
     """
 
-    def __in_domain__(self, param: any) -> bool:
+    @abstractmethod
+    def __in_domain__(self, value: Any) -> bool:
         """
         Method which check value in Domain
+
+        :param value: value to check
         """
         pass
 
     def __repr__(self) -> str:
-        return type(self).__name__
-
-    def __str__(self) -> str:
-        return repr(self)
+        return f"{type(self).__name__}"
 
     def __contains__(self, item) -> bool:
         return self.__in_domain__(item)

@@ -12,12 +12,6 @@ class OperationHandler:
     Default operations for Var, Expression
     """
 
-    def __is_const__(self, other) -> bool:
-        """
-        Check other is constant type
-        """
-        return isinstance(other, (int, float, complex))
-
     def __add__(self, other):
         other = Expression.to_expression(other)
         self = Expression.to_expression(self)
@@ -85,6 +79,7 @@ class OperationHandler:
 
 
 class Constant(OperationHandler):
+    # TODO: Implement domain for constants
     def __init__(self, value: Union[int, float, complex]):
         self._value = value
 
@@ -109,7 +104,7 @@ class VarMeta(type):
         Var("x", value=None, domain=DefaultDomain)
     """
 
-    def __getattr__(cls, var_name):
+    def __getattr__(cls, var_name: str):
         if not cls.exist(var_name):
             raise NameError(f"Variable with name `{var_name}` not exist")
         return cls.__defined_vars__[var_name]
@@ -130,7 +125,7 @@ class Var(OperationHandler, metaclass=VarMeta):
 
     __defined_vars__ = {}
 
-    def __new__(cls, name, value: any = None, domain: Domain = DefaultDomain()):
+    def __new__(cls, name: str, value: any = None, domain: Domain = DefaultDomain()):
         """
         Singleton pattern
 
@@ -205,14 +200,19 @@ class Expression(OperationHandler):
 
     @staticmethod
     def to_expression(other):
+        """
+        Convert Var, Constant or Callable to Expression
+
+        :param other: object that will be convert to Expression
+        """
         if isinstance(other, Var):
             return Expression.from_var(other)
         elif isinstance(other, (Constant, int, float, complex)):
             return Expression.from_const(other)
         elif isinstance(other, Expression):
             return other
-        elif isinstance(other, Callable):
-            return Expression.from_func(other)
+        # elif isinstance(other, Callable):
+        # return Expression.from_func(other)
         else:
             raise TypeError(
                 f"Invalid type `{type(other).__name__}` to convert to Expression"
@@ -230,6 +230,8 @@ class Expression(OperationHandler):
 
     @staticmethod
     def from_func(func: Callable):
+        # WARNING: Don't use, use Expression.from_callable
+        # TODO: Implement derivative for function
         # NOTE: Use func.__code__.co_varnames to get function parameters
         vars = []
         for v in func.__code__.co_varnames:
@@ -270,7 +272,31 @@ class Expression(OperationHandler):
 
         return self._operation(*operands)
 
+    def simplify(self):
+        """
+        Simplify expression
+
+        Example:
+        >>> e = x + x
+            '(x + x)'
+        >>> e.simplify()
+            '(2 * x)'
+        """
+        # TODO:
+        pass
+
     def substitude(self, **params):
+        """
+        Substitude Expression to Expression of argument value
+
+        Usage:
+        >>> e1 = x + y
+            '(x + y)'
+        >>> e2 = z + 1
+            '(z + 1)'
+        >>> e1.substitude(x=e2)
+            '((z + 1) + y)'
+        """
         operands = []
         vars = self.vars
         for op in self._operands:
@@ -292,6 +318,17 @@ class Expression(OperationHandler):
         return Expression(self._operation, vars, operands)
 
     def derivative(self, var: Var):
+        """
+        Take partial derivative from expression
+
+        Usage:
+        >>> e = x ** 2
+            '(x ^ 2)'
+        >>> e.derivative(x)     # take partial by 'x' varible
+            '((x ^ 2) * ((0 * log(x)) + (2 / x)))'
+        >>> e.dx                # you can also use this syntax sugar (! register sensetive)
+            '((x ^ 2) * ((0 * log(x)) + (2 / x)))'
+        """
         # TODO: Implement derivative for funciton
 
         if self._operation not in [Add, Sub, Mul, Div, Pow, OpVar, OpConst]:
@@ -363,7 +400,7 @@ class Expression(OperationHandler):
 
     def __getattr__(self, attr: str):
         if attr.startswith("d"):
-            name = attr.split("d")[1]
+            name = attr[1:]
             if not name:
                 name = "x"
             var = Var(name) if not Var.exist(name) else getattr(Var, name)
