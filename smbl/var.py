@@ -3,7 +3,7 @@ from .operation import Operation, UnaryOperation, BinaryOperation
 from .operation import OpVar, OpConst
 from .operation import Add, Sub, Mul, Div, FloorDiv, Mod, Pow
 
-from typing import Callable, Union
+from typing import Any, Callable, Union
 import math  # for log(x) function
 
 
@@ -125,7 +125,7 @@ class Var(OperationHandler, metaclass=VarMeta):
 
     __defined_vars__ = {}
 
-    def __new__(cls, name: str, value: any = None, domain: Domain = DefaultDomain()):
+    def __new__(cls, name: str, value: Any = None, domain: Domain = DefaultDomain()):
         """
         Singleton pattern
 
@@ -144,7 +144,7 @@ class Var(OperationHandler, metaclass=VarMeta):
             cls.__defined_vars__[name] = self
         return cls.__defined_vars__[name]
 
-    def __call__(self) -> any:
+    def __call__(self) -> Any:
         return self.value
 
     @property
@@ -152,11 +152,11 @@ class Var(OperationHandler, metaclass=VarMeta):
         return self._name
 
     @property
-    def value(self) -> any:
+    def value(self) -> Any:
         return self._value
 
     @value.setter
-    def value(self, val: any):
+    def value(self, val: Any):
         if val in self._domain:
             self._value = val
         else:
@@ -180,7 +180,7 @@ class Var(OperationHandler, metaclass=VarMeta):
 
 
 class Expression(OperationHandler):
-    def __init__(self, operation: Operation, vars: set[Var], operands: list[any]):
+    def __init__(self, operation: Operation, vars: set[Var], operands: list[Any]):
         """
         :param operation: Operation for Expression, CONST, VAR return value of Var
                           or Constant
@@ -277,10 +277,10 @@ class Expression(OperationHandler):
         Simplify expression
 
         Example:
-        >>> e = x + x
-            '(x + x)'
+        >>> e = x + x + x
+            '((x + x) + x)'
         >>> e.simplify()
-            '(2 * x)'
+            '(3 * x)'
         """
         # TODO:
         pass
@@ -359,7 +359,7 @@ class Expression(OperationHandler):
         elif self._operation is Pow:
             return f**g * (gd * ln.substitude(x=f) + g / f)
 
-    def _derivative(self, expr: any, var: Var):
+    def _derivative(self, expr: Any, var: Var):
         if isinstance(expr, Expression):
             return expr.derivative(var)
         elif isinstance(expr, Var) and expr is var:

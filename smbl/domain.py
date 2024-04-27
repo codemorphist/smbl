@@ -32,7 +32,7 @@ class DefaultDomain(Domain):
     Default domain which alway return True
     """
 
-    def __in_domain__(self, param: any) -> bool:
+    def __in_domain__(self, param: Any) -> bool:
         return True
 
 
