@@ -89,6 +89,14 @@ class Constant(OperationHandler):
     def __str__(self) -> str:
         return str(self._value)
 
+    def __eq__(self, other) -> str:
+        if isinstance(other, Constant):
+            return self._value == other._value
+        elif isinstance(other, (int, float, complex)):
+            return self._value == other
+        else:
+            return False
+
     def __repr__(self) -> str:
         return f"Constant(type={type(self._value).__name__}, value={self._value})"
 
@@ -114,6 +122,16 @@ class VarMeta(type):
         Check var is exist by name
         """
         return var in cls.__defined_vars__
+
+    def delete(cls, var: str):
+        if not cls.exist(var):
+            raise NameError(f"Variable with name `{var}` not exist")
+        del cls.__defined_vars__[var]
+
+    def vars(cls, vars_str: str):
+        vars_names = vars_str.split()
+        for name in vars_names:
+            yield cls(name)
 
 
 class Var(OperationHandler, metaclass=VarMeta):
@@ -177,6 +195,12 @@ class Var(OperationHandler, metaclass=VarMeta):
 
     def __set__(self, other):
         self.value = other
+
+    def __del__(self):
+        Var.delete(self.name)
+
+    def __eq__(self, other):
+        return self is other
 
 
 class Expression(OperationHandler):
@@ -366,6 +390,18 @@ class Expression(OperationHandler):
             return Expression.to_expression(1)
         else:
             return Expression.to_expression(0)
+
+    def __eq__(self, other):
+        if not isinstance(other, Expression):
+            return False
+        
+        if self._operation is not other._operation:
+            return False
+
+        if self._operands != other._operands:
+            return False
+
+        return True
 
     def __repr__(self, ident: int = 0) -> str:
         tab = "  "

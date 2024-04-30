@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "smbl"
+version = "0.1.0"
+description = "Simple implementation of symbolic calculation written on pure Python"
+authors = ["Alex Katrenko <112182502+codemorphist@users.noreply.github.com>"]
+license = "GPL-3.0-only"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
