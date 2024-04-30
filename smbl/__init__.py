@@ -1,4 +1,4 @@
-from smbl.var import Var, Constant, Expression
+from .var import Var, Constant, Expression
 
-import smbl.operation as operation
-import smbl.domain as domain
+from . import operation
+from . import domain
