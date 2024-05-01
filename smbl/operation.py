@@ -1,5 +1,8 @@
+from typing import Any, Callable
+
+
 class Operation:
-    def __init__(self, symbol: str, operation: callable, operand_count: int = 2):
+    def __init__(self, symbol: str, operation: Callable, operand_count: int = 2):
         """
         :param symbol: symbol of Operation
         :param operation: python function to calculate operation from
@@ -10,7 +13,7 @@ class Operation:
         self._operation = operation
         self._operand_count = operand_count
 
-    def __call__(self, *operands) -> any:
+    def __call__(self, *operands) -> Any:
         if len(operands) < self._operand_count:
             raise Exception("Not enought operands for calculate result")
         elif len(operands) > self._operand_count:
@@ -26,12 +29,12 @@ class Operation:
 
 
 class UnaryOperation(Operation):
-    def __init__(self, symbol: str, operation: callable):
+    def __init__(self, symbol: str, operation: Callable):
         super().__init__(symbol, operation, operand_count=1)
 
 
 class BinaryOperation(Operation):
-    def __init__(self, symbol: str, operation: callable):
+    def __init__(self, symbol: str, operation: Callable):
         super().__init__(symbol, operation, operand_count=2)
 
 

@@ -32,26 +32,8 @@ class DefaultDomain(Domain):
     Default domain which alway return True
     """
 
-    def __in_domain__(self, param: Any) -> bool:
+    def __in_domain__(self, _) -> bool:
         return True
-
-
-class EvenDomain(Domain):
-    """
-    Domain for even numbers
-    """
-
-    def __in_domain__(self, value: int) -> bool:
-        return value % 2 == 0
-
-
-class OddDomain(Domain):
-    """
-    Domain for odd numbers
-    """
-
-    def __in_domain__(self, value: int) -> bool:
-        return value not in EvenDomain()
 
 
 class IntegerDomain(Domain):
@@ -63,6 +45,24 @@ class IntegerDomain(Domain):
 
     def __in_domain__(self, value: int) -> bool:
         return isinstance(value, int)
+
+
+class EvenDomain(Domain):
+    """
+    Domain for even numbers
+    """
+
+    def __in_domain__(self, value: int) -> bool:
+        return value in IntegerDomain() and value % 2 == 0
+
+
+class OddDomain(Domain):
+    """
+    Domain for odd numbers
+    """
+
+    def __in_domain__(self, value: int) -> bool:
+        return value in IntegerDomain() and value % 2 != 0
 
 
 class NaturalDomain(Domain):
@@ -96,8 +96,8 @@ class PrimeDomain(Domain):
             return False
 
         i = 3
-        while i * i <= value:
-            if value % i:
+        while i * i < value:
+            if value % i == 0:
                 return False
             i += 2
         return True
@@ -114,7 +114,7 @@ class IntegerPrimeDomain(Domain):
     """
 
     def __in_domain__(self, value: int) -> bool:
-        return value in IntegerDomain() and abs(value) in PrimeDomain()
+        return abs(value) in PrimeDomain()
 
 
 class RealDomain(Domain):
@@ -175,3 +175,5 @@ class Zp(Zn):
         if p not in PrimeDomain():
             raise ValueError("Modulo must prime number")
         super().__init__(p)
+
+

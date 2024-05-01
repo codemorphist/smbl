@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from .domain import Domain, DefaultDomain
 from .operation import Operation, UnaryOperation, BinaryOperation
 from .operation import OpVar, OpConst
 from .operation import Add, Sub, Mul, Div, FloorDiv, Mod, Pow
 
-from typing import Any, Callable, Union
+from typing import Any, Callable, Optional, Union
 import math  # for log(x) function
 
 
@@ -89,7 +91,7 @@ class Constant(OperationHandler):
     def __str__(self) -> str:
         return str(self._value)
 
-    def __eq__(self, other) -> str:
+    def __eq__(self, other) -> bool:
         if isinstance(other, Constant):
             return self._value == other._value
         elif isinstance(other, (int, float, complex)):
@@ -204,7 +206,10 @@ class Var(OperationHandler, metaclass=VarMeta):
 
 
 class Expression(OperationHandler):
-    def __init__(self, operation: Operation, vars: set[Var], operands: list[Any]):
+    def __init__(self, 
+                 operation: Union[Operation, Callable], 
+                 vars: set[Var], 
+                 operands: list[Any]):
         """
         :param operation: Operation for Expression, CONST, VAR return value of Var
                           or Constant
@@ -223,7 +228,7 @@ class Expression(OperationHandler):
         return self._vars
 
     @staticmethod
-    def to_expression(other):
+    def to_expression(other) -> Expression:
         """
         Convert Var, Constant or Callable to Expression
 
@@ -243,17 +248,17 @@ class Expression(OperationHandler):
             )
 
     @staticmethod
-    def from_var(var: Var):
+    def from_var(var: Var) -> Expression:
         return Expression(OpVar, {var}, [var])
 
     @staticmethod
-    def from_const(const: Union[Constant, int, float, complex]):
+    def from_const(const: Union[Constant, int, float, complex]) -> Expression:
         if isinstance(const, (int, float, complex)):
             const = Constant(const)
         return Expression(OpConst, set(), [const])
 
     @staticmethod
-    def from_func(func: Callable):
+    def from_func(func: Callable) -> Expression:
         # WARNING: Don't use, use Expression.from_callable
         # TODO: Implement derivative for function
         # NOTE: Use func.__code__.co_varnames to get function parameters
@@ -267,10 +272,10 @@ class Expression(OperationHandler):
         return Expression(func, set(vars), vars)
 
     @staticmethod
-    def from_callable(func: Callable, vars: set[Var]):
+    def from_callable(func: Callable, vars: set[Var]) -> Expression:
         return Expression(func, vars, [*vars])
 
-    def __call__(self, **vars):
+    def __call__(self, **vars) -> Union[Constant, int, float, complex]:
         """
         Calculate value of Expression or return new
         Expression with replace given Vars values
@@ -296,7 +301,7 @@ class Expression(OperationHandler):
 
         return self._operation(*operands)
 
-    def simplify(self):
+    def simplify(self) -> Expression:
         """
         Simplify expression
 
@@ -309,7 +314,7 @@ class Expression(OperationHandler):
         # TODO:
         pass
 
-    def substitude(self, **params):
+    def substitude(self, **params) -> Expression:
         """
         Substitude Expression to Expression of argument value
 
@@ -383,7 +388,7 @@ class Expression(OperationHandler):
         elif self._operation is Pow:
             return f**g * (gd * ln.substitude(x=f) + g / f)
 
-    def _derivative(self, expr: Any, var: Var):
+    def _derivative(self, expr: Expression, var: Var):
         if isinstance(expr, Expression):
             return expr.derivative(var)
         elif isinstance(expr, Var) and expr is var:
@@ -391,7 +396,7 @@ class Expression(OperationHandler):
         else:
             return Expression.to_expression(0)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if not isinstance(other, Expression):
             return False
         
