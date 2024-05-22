@@ -1,40 +1,73 @@
 from __future__ import annotations
+import re
 
 
 class Relation2:
-    def __init__(self, relation: set[tuple[int, int]]):
+    def __init__(self, 
+                 relation: set[tuple[int, int]], 
+                 M: set[int] = None):
+        """
+        :param relation: set with relation pairs
+        :param M: set with relation elements
+        """
         self.relation = relation
+        if M is None:
+            m = set()
+            for a, b in self.relation:
+                m.add(a)
+                m.add(b)
+            self.M = m 
+        else:
+            self.M = M
 
-    def __contains__(self, pair: tuple):
+    def __contains__(self, pair: tuple[int, int]) -> bool:
+        """
+        Check pair in relation
+        """
         return pair in self.relation
 
-    def M(self) -> set[int]:
-        m = set()
-        for a, b in self.relation:
-            m.add(a)
-            m.add(b)
-        return m
+    @property
+    def pairs(self) -> set[tuple[int, int]]:
+        """
+        :return: pairs in relation
+        """
+        return self.relation
 
+    @property
     def Pr1(self) -> set[int]:
         pr1 = set()
         for a, _ in self.relation:
             pr1.add(a)
         return pr1
 
+    @property
     def Pr2(self) -> set[int]:
         pr2 = set()
         for _, b in self.relation:
             pr2.add(b)
         return pr2
 
-    def startwith(self, s: int) -> set[tuple]:
+    @property
+    def r(self) -> Relation2:
+        """
+        Return inverse relation
+        """
+        return self**(-1)
+
+    def startswith(self, s: int) -> set[tuple[int, int]]:
+        """
+        Return all pairs which starts with [s]
+        """
         st = set()
         for a, b in self.relation:
             if a == s:
                 st.add((a, b))
         return st
 
-    def endwith(self, e: int) -> set[tuple]:
+    def endswith(self, e: int) -> set[tuple[int, int]]:
+        """
+        Return all pairs which ends with [e]
+        """
         ed = set()
         for a, b in self.relation:
             if b == e:
@@ -42,34 +75,137 @@ class Relation2:
         return ed
 
     def __pow__(self, p: int):
-        if p < 0:
-            return (p**(-1))**abs(p) 
-        elif p == 0:
-            raise ValueError("Invalid power value: 0")
-        elif p == -1:
+        if p == -1:
             new_relation = set()
             for a, b in self.relation:
                 new_relation.add((b, a))
             return Relation2(new_relation)
+        elif p == 0:
+            raise ValueError("Invalid power value: 0")
+        elif p == -1:
+            return (p**(-1))**abs(p) 
         else:
             res = self
             rel = self 
+            p -= 1
             while p:
                 if p % 2:
                     res *= rel
                 rel *= rel
                 p >>= 1
-            return res
+            return rel
 
     def __mul__(self, relation: Relation2) -> Relation2:
+        """
+        Multiplicate two relation
+
+        (a, b) in (p1 * p2) <=>  E c: (a, c) in p1 and (c, b) in p2 
+        """
         res = set()
         for a, b in self.relation:
-            for _, d in relation.startwith(b):
+            for _, d in relation.startswith(b):
                 res.add((a, d))
         return Relation2(res)
 
     def __str__(self) -> str:
         return str(self.relation)
 
+
+def reflexive(relation: Relation2) -> bool:
+    """
+    Check relation is reflexive
+
+    A a in M: (a, a) in p
+    """
+    for a in relation.M:
+        if (a, a) not in relation:
+            return False
+    return True
+
+
+def irreflexive(relation: Relation2) -> bool:
+    """
+    Check relation is irreflexive
+
+    A a in M: (a, a) not in p
+    """
+    for a in relation.M:
+        if (a, a) in relation:
+            return False
+    return True
+
+
+def symmetric(relation: Relation2) -> bool:
+    """
+    Check relation is symmetric 
+
+    A a,b: (a, b) in p => (b, a) in p 
+    """
+    for a, b in relation.pairs:
+        if (b, a) not in relation:
+            return False
+    return True
+
+
+def asymmetric(relation: Relation2) -> bool:
+    """
+    Check relation is asymmetric 
+
+    A a,b: (a, b) in p => (b, a) not in p 
+    """
+    for a, b in relation.pairs:
+        if (b, a) in relation:
+            return False
+    return True
+
+
+def antisymmetric(relation: Relation2) -> bool:
+    """
+    Check relation is antisymmetric 
+
+    A a,b: (a, b) in p and (b, a) in p => a = b 
+    """
+    for a, b in relation.pairs:
+        if a != b and (b, a) in relation:
+            return False
+    return True
+
+
+def transitive(relation: Relation2) -> bool:
+    """
+    Check relation is transitive
+
+    A a,b,c: (a, b) in p and (b, c) in p => (a, c) in p
+    """
+    for a, b in relation.pairs:
+        for _, c in relation.startswith(b):
+            if (a, c) not in relation:
+                return False
+    return True
+
+
+def antitransitive(relation: Relation2) -> bool:
+    """
+    Check relation is transitive
+
+    A a,b,c: (a, b) in p and (b, c) in p => (a, c) not in p
+    """
+    for a, b in relation.pairs:
+            for _, c in relation.startswith(b):
+                if (a, c) in relation:
+                    return False
+    return True
+
+
+def connected(relation: Relation2) -> bool:
+    """
+    Check relation is connected
+
+    A a,b: (a, b) in p or (b, a) in p
+    """
+    for pair in zip(relation.M, relation.M):
+        if pair not in relation:
+            return False
+    return True
 
 
