@@ -1,3 +1,8 @@
+"""
+This module implements basic funciton and tools
+for work with relations
+"""
+
 from __future__ import annotations
 from copy import copy
 
@@ -96,7 +101,7 @@ class Relation2:
             return Relation2(new_relation)
         elif p == 0:
             raise ValueError("Invalid power value: 0")
-        elif p == -1:
+        elif p < 0:
             return (p**(-1))**abs(p) 
         else:
             res = self
@@ -124,6 +129,8 @@ class Relation2:
     def __str__(self) -> str:
         return str(self.pairs)
 
+
+# -- BASIC PROPERTIES --
 
 def reflexive(relation: Relation2) -> bool:
     """
@@ -215,10 +222,24 @@ def connected(relation: Relation2) -> bool:
     """
     Check relation is connected
 
+    A a,b: a != b => (a, b) in p or (b, a) in p
+    """
+    for a, b in zip(relation.M, relation.M):
+        if a == b:
+            continue
+        if (a, b) not in relation and (b, a) not in relation:
+            return False
+    return True
+
+
+def strongly_connected(relation: Relation2) -> bool:
+    """
+    Check relation is connected
+
     A a,b: (a, b) in p or (b, a) in p
     """
-    for pair in zip(relation.M, relation.M):
-        if pair not in relation:
+    for a, b in zip(relation.M, relation.M):
+        if (a, b) not in relation and (b, a) not in relation:
             return False
     return True
 
@@ -236,4 +257,40 @@ def transitive_closure(relation: Relation2) -> Relation2:
                 transitive_closure_pairs.add((a, c))
     
     return Relation2(transitive_closure_pairs)
+
+# -- COMBINATION OF PROPERTIES --
+
+def equivalence(relation: Relation2) -> bool:
+    for prop in (reflexive, symmetric, transitive):
+        if not prop(relation):
+            return False
+    return True
+
+
+def partial_order(relation: Relation2) -> bool:
+    for prop in (reflexive, symmetric, transitive):
+        if not prop(relation):
+            return False
+    return True
+
+def strict_partial_order(relation: Relation2) -> bool:
+    for prop in (irreflexive, asymmetric, transitive):
+        if not prop(relation):
+            return False
+    return True
+
+
+def total_order(relation: Relation2) -> bool:
+    for prop in (reflexive, antisymmetric, transitive, connected):
+        if not prop(relation):
+            return False
+    return True
+
+
+def strict_total_order(relation: Relation2) -> bool:
+    for prop in (irreflexive, asymmetric, transitive, connected):
+        if not prop(relation):
+            return False
+    return True
+
 
