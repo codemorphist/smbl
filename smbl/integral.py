@@ -12,10 +12,10 @@ def stieltjes_integral(f: Callable[[float], float],
     Return integral of function on segment
     by Riman-Stieltjes
 
-    :param f:           funtion
+    :param f:           function
     :param g:           not-decreasing function 
     :param segment:     segment
-    :param dx:          segment len
+    :param dx:          step
 
     :return:            integral value
     """
@@ -26,7 +26,7 @@ def stieltjes_integral(f: Callable[[float], float],
     if a > b:
         a, b = b, a
 
-    while a <= b:
+    while a < b:
         dg = g(a + dx) - g(a)
         if dg < 0:
             raise TypeError("Invalid type of g function, it must be non-decreasing")
@@ -42,9 +42,9 @@ def riman_integral(f: Callable[[float], float],
     Return integral of function on segment
     by Riman
 
-    :param f:           funtion
+    :param f:           function
     :param segment:     segment
-    :param dx:          segment len
+    :param dx:          step
 
     :return:            integral value
     """
