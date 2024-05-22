@@ -4,7 +4,7 @@ from copy import copy
 
 class Relation2:
     def __init__(self, 
-                 relation: set[tuple[int, int]], 
+                 relation: set[tuple[int, int]] = set(), 
                  M: set[int] = set()):
         """
         :param relation: set with relation pairs
@@ -25,6 +25,16 @@ class Relation2:
         Check pair in relation
         """
         return pair in self._relation
+
+    @property
+    def matrix(self) -> list[list[int]]:
+        mat = [ [0 for _ in self.M] for _ in self.M]
+        elems = list(self.M)
+        for a, b in self.pairs:
+            i = elems.index(a)
+            j = elems.index(b)
+            mat[i][j] = 1
+        return mat
 
     @property
     def M(self):
