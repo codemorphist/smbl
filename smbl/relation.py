@@ -7,30 +7,65 @@ from __future__ import annotations
 from copy import copy
 
 
-class Relation2:
+class Relation:
+    def __init__(self, 
+                 relation: set[tuple] = set(),
+                 M: set = set()):
+        self._relation = relation
+        if M == set():
+            self._M = set()
+            for s in self._relation:
+                for a in s:
+                    self._M.add(a)
+        else:
+            self._M = M
+
+    def __contains__(self, rel: tuple) -> bool:
+        """
+        Check pair in relation
+        """
+        return rel in self._relation
+
+    @property
+    def relation(self) -> set[tuple]:
+        """
+        :return: relation sets
+        """
+        return copy(self._relation)
+
+    @property
+    def M(self):
+        """
+        :return: set of relation elements
+        """
+        return copy(self._M)
+
+    def __or__(self, relation: Relation) -> Relation:
+        """
+        Union of relations
+        """
+        return type(self)(self._relation | relation._relation)
+
+    def __and__(self, relation: Relation) -> Relation:
+        """
+        Intersection of relations
+        """
+        return type(self)(self._relation & relation._relation)
+
+    def __str__(self) -> str:
+        return str(self._relation)
+
+
+class Relation2(Relation):
     def __init__(self, 
                  relation: set[tuple[int, int]] = set(), 
-                 M: set[int] = set()):
+                 M: set = set()):
         """
         :param relation: set with relation pairs
         :param M: set with relation elements
         """
-        self._relation = relation
-        if M == set():
-            m = set()
-            for a, b in self._relation:
-                m.add(a)
-                m.add(b)
-            self._M = m 
-        else:
-            self._M = M
-
-    def __contains__(self, pair: tuple[int, int]) -> bool:
-        """
-        Check pair in relation
-        """
-        return pair in self._relation
-
+        super().__init__(relation)
+        
     @property
     def matrix(self) -> list[list[int]]:
         mat = [ [0 for _ in self.M] for _ in self.M]
@@ -42,11 +77,7 @@ class Relation2:
         return mat
 
     @property
-    def M(self):
-        return copy(self._M)
-
-    @property
-    def pairs(self) -> set[tuple[int, int]]:
+    def pairs(self) -> set[tuple]:
         """
         :return: pairs in relation
         """
@@ -54,6 +85,10 @@ class Relation2:
 
     @property
     def Pr1(self) -> set[int]:
+        """
+        Let p = { (a_1, b_1), (a_2, b_2), ... }
+        :return: first projection of relation {a_1, a_2, ...}
+        """
         pr1 = set()
         for a, _ in self._relation:
             pr1.add(a)
@@ -61,6 +96,10 @@ class Relation2:
 
     @property
     def Pr2(self) -> set[int]:
+        """
+        Let p = { (a_1, b_1), (a_2, b_2), ... }
+        :return: second projection of relation {b_1, b_2, ...}
+        """
         pr2 = set()
         for _, b in self.pairs:
             pr2.add(b)
@@ -73,7 +112,7 @@ class Relation2:
         """
         return self**(-1)
 
-    def startswith(self, s: int) -> set[tuple[int, int]]:
+    def startswith(self, s: int) -> set[tuple]:
         """
         Return all pairs which starts with [s]
         """
@@ -83,7 +122,7 @@ class Relation2:
                 st.add((a, b))
         return st
 
-    def endswith(self, e: int) -> set[tuple[int, int]]:
+    def endswith(self, e: int) -> set[tuple]:
         """
         Return all pairs which ends with [e]
         """
@@ -126,8 +165,8 @@ class Relation2:
                 res.add((a, d))
         return Relation2(res)
 
-    def __str__(self) -> str:
-        return str(self.pairs)
+    def __invert__(self) -> Relation2:
+        return self.r
 
 
 # -- BASIC PROPERTIES --
